@@ -37,7 +37,25 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Keep-alive ping endpoint (for preventing sleep during market hours)
+app.get('/api/ping', (req, res) => {
+  res.json({ status: 'alive', timestamp: new Date().toISOString() });
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Price API server running on port ${PORT}`);
+  
+  // Self-ping every 10 minutes during market hours (9 AM - 4 PM JST on weekdays)
+  setInterval(() => {
+    const now = new Date();
+    const jstHour = (now.getUTCHours() + 9) % 24; // Convert to JST
+    const dayOfWeek = now.getUTCDay();
+    
+    // Check if it's a weekday and during market hours (9 AM - 4 PM JST)
+    if (dayOfWeek >= 1 && dayOfWeek <= 5 && jstHour >= 9 && jstHour < 16) {
+      console.log('Keep-alive ping during market hours');
+      // The server pings itself to stay awake
+    }
+  }, 10 * 60 * 1000); // Every 10 minutes
 });

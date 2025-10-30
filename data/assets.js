@@ -371,3 +371,28 @@ export const futureProjectionData = [
   { x: 2029, y: 920000 },
   { x: 2030, y: 1100000 },
 ];
+
+// Keep-alive function to prevent Render.com from sleeping
+let keepAliveInterval = null;
+
+export const startKeepAlive = () => {
+  if (keepAliveInterval) return; // Already running
+  
+  // Ping every 10 minutes to keep server awake
+  keepAliveInterval = setInterval(async () => {
+    try {
+      const pingUrl = API_CONFIG.METAPLANET_API_URL.replace('/api/metaplanet-price', '/api/ping');
+      await fetch(pingUrl);
+      console.log('[Keep-Alive] Pinged server');
+    } catch (error) {
+      console.log('[Keep-Alive] Ping failed (server might be sleeping)');
+    }
+  }, 10 * 60 * 1000); // Every 10 minutes
+};
+
+export const stopKeepAlive = () => {
+  if (keepAliveInterval) {
+    clearInterval(keepAliveInterval);
+    keepAliveInterval = null;
+  }
+};

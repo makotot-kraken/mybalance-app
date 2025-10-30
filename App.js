@@ -11,7 +11,9 @@ import {
   fetchUSDPrices,
   calculateHoldingValue,
   calculateGainLoss,
-  calculateGainLossPercentage
+  calculateGainLossPercentage,
+  startKeepAlive,
+  stopKeepAlive
 } from './data/assets';
 
 const Tab = createBottomTabNavigator();
@@ -484,6 +486,18 @@ function Crypto() {
 
 export default function App() {
   console.log('[App] Starting MyBalance app...');
+  
+  // Start keep-alive on app mount
+  useEffect(() => {
+    console.log('[App] Starting keep-alive service');
+    startKeepAlive();
+    
+    return () => {
+      console.log('[App] Stopping keep-alive service');
+      stopKeepAlive();
+    };
+  }, []);
+  
   return (
     <>
       <StatusBar style="light" backgroundColor="#0E1111" />
