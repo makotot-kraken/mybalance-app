@@ -1,9 +1,9 @@
 // API Configuration
 // Change this when deploying to production
 export const API_CONFIG = {
-  // Local development
+  // Local development (uncomment to use local API)
   // METAPLANET_API_URL: 'http://localhost:3001/api/metaplanet-price',
   
-  // Production (update this with your Render.com URL after deployment)
-  METAPLANET_API_URL: 'https://mybalance-api.onrender.com/api/metaplanet-price',
+  // Production - Render.com deployment
+  METAPLANET_API_URL: 'https://mybalance-app.onrender.com/api/metaplanet-price',
 };
