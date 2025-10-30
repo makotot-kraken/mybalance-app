@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: mybalance-api
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm install
+    startCommand: node api-server.js
+    envVars:
+      - key: NODE_ENV
+        value: production

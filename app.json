@@ -1,0 +1,37 @@
+{
+  "expo": {
+    "name": "MyBalance",
+    "slug": "mybalance",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0E1111"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mybalance.app",
+      "buildNumber": "1.0.0"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#0E1111"
+      },
+      "package": "com.mybalance.app",
+      "versionCode": 1
+    },
+    "web": {
+      "favicon": "./assets/icon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "placeholder-for-eas"
+      }
+    }
+  }
+}
