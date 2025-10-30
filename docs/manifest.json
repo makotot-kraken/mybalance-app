@@ -1,0 +1,18 @@
+{
+  "name": "MyBalance - Portfolio Tracker",
+  "short_name": "MyBalance",
+  "description": "Personal finance and portfolio tracking app",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0E1111",
+  "theme_color": "#0E1111",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
