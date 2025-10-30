@@ -39,7 +39,7 @@
       "backgroundColor": "#0E1111",
       "display": "standalone",
       "orientation": "portrait",
-      "startUrl": "/"
+      "startUrl": "/mybalance-app/"
     },
     "extra": {
       "eas": {
