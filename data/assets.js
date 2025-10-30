@@ -155,41 +155,21 @@ export const fetchRealTimePrices = async () => {
 
     await Promise.all(stockPromises);
 
-    // For Metaplanet, fetch from our API server
+    // For Metaplanet, scrape directly from Yahoo Finance Japan
     try {
-      console.log('[JPY Prices] Fetching Metaplanet price from API...');
-      const metaplanetResponse = await fetch(API_CONFIG.METAPLANET_API_URL);
-      console.log('[JPY Prices] Metaplanet response status:', metaplanetResponse.status);
-      const metaplanetData = await metaplanetResponse.json();
-      console.log('[JPY Prices] Metaplanet data received:', metaplanetData);
+      console.log('[JPY Prices] Scraping Metaplanet price from Yahoo Finance Japan...');
+      const yahooResponse = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/3350.T?interval=1d&range=1d');
+      const yahooData = await yahooResponse.json();
       
-      // If we got a fallback price (785) or error, try direct Yahoo Finance fetch
-      if (metaplanetData && metaplanetData.source === 'fallback') {
-        console.warn('[JPY Prices] Got fallback price, trying direct Yahoo Finance...');
-        try {
-          const yahooResponse = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/3350.T?interval=1d&range=1d');
-          const yahooData = await yahooResponse.json();
-          if (yahooData?.chart?.result?.[0]?.meta?.regularMarketPrice) {
-            const realPrice = yahooData.chart.result[0].meta.regularMarketPrice;
-            prices['3350.T'] = realPrice;
-            console.log('[JPY Prices] Metaplanet price from Yahoo Finance:', realPrice);
-          } else {
-            prices['3350.T'] = metaplanetData.price; // Use fallback
-          }
-        } catch (yahooError) {
-          console.error('[JPY Prices] Yahoo Finance direct fetch failed:', yahooError);
-          prices['3350.T'] = metaplanetData.price; // Use fallback
-        }
-      } else if (metaplanetData && metaplanetData.price) {
-        prices['3350.T'] = metaplanetData.price;
-        console.log('[JPY Prices] Metaplanet price set to:', metaplanetData.price);
-      } else if (metaplanetData && metaplanetData.error) {
-        console.error('[JPY Prices] Metaplanet API returned error:', metaplanetData.error);
+      if (yahooData?.chart?.result?.[0]?.meta?.regularMarketPrice) {
+        const realPrice = yahooData.chart.result[0].meta.regularMarketPrice;
+        prices['3350.T'] = realPrice;
+        console.log('[JPY Prices] Metaplanet price scraped:', realPrice);
       } else {
-        console.warn('[JPY Prices] Metaplanet data has no price:', metaplanetData);
+        console.error('[JPY Prices] Failed to parse Yahoo Finance data for Metaplanet');
       }
     } catch (error) {
-      console.error('[JPY Prices] Metaplanet API failed:', error);
+      console.error('[JPY Prices] Yahoo Finance scraping failed for Metaplanet:', error);
     }
 
     priceCache = prices;

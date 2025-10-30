@@ -17,8 +17,7 @@ app.get('/api/metaplanet-price', (req, res) => {
   exec(`python3 "${scriptPath}"`, (error, stdout, stderr) => {
     if (error) {
       console.error('Error running Python script:', error);
-      // Return fallback price
-      res.json({ price: 785, currency: 'JPY', symbol: '3350.T', source: 'fallback' });
+      res.status(500).json({ error: 'Failed to scrape price', details: error.message });
       return;
     }
     
@@ -27,7 +26,7 @@ app.get('/api/metaplanet-price', (req, res) => {
       res.json({ ...result, source: 'scraped' });
     } catch (parseError) {
       console.error('Error parsing Python output:', parseError);
-      res.json({ price: 785, currency: 'JPY', symbol: '3350.T', source: 'fallback' });
+      res.status(500).json({ error: 'Failed to parse scraper output', details: parseError.message });
     }
   });
 });
