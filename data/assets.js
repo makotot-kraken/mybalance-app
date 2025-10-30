@@ -1,3 +1,5 @@
+import { API_CONFIG } from '../config/api';
+
 // Your actual portfolio holdings
 export const portfolio = {
   crypto: [
@@ -153,10 +155,10 @@ export const fetchRealTimePrices = async () => {
 
     await Promise.all(stockPromises);
 
-    // For Metaplanet, fetch from our local API server
+    // For Metaplanet, fetch from our API server
     try {
       console.log('[JPY Prices] Fetching Metaplanet price from API...');
-      const metaplanetResponse = await fetch('http://localhost:3001/api/metaplanet-price');
+      const metaplanetResponse = await fetch(API_CONFIG.METAPLANET_API_URL);
       console.log('[JPY Prices] Metaplanet response status:', metaplanetResponse.status);
       const metaplanetData = await metaplanetResponse.json();
       console.log('[JPY Prices] Metaplanet data received:', metaplanetData);
@@ -217,10 +219,10 @@ export const fetchUSDPrices = async () => {
 
     await Promise.all(stockPromises);
 
-    // For Metaplanet, fetch from our local API server (already in JPY)
+    // For Metaplanet, fetch from our API server (already in JPY)
     try {
       console.log('[USD Prices] Fetching Metaplanet price from API...');
-      const metaplanetResponse = await fetch('http://localhost:3001/api/metaplanet-price');
+      const metaplanetResponse = await fetch(API_CONFIG.METAPLANET_API_URL);
       console.log('[USD Prices] Metaplanet response status:', metaplanetResponse.status);
       const metaplanetData = await metaplanetResponse.json();
       console.log('[USD Prices] Metaplanet data received:', metaplanetData);
