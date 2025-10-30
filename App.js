@@ -131,6 +131,70 @@ export default function App() {
 
   const totalValue = stockValue + cryptoValue;
 
+  // Calculate total gain/loss for stocks
+  const [stockTotalGainLoss, setStockTotalGainLoss] = useState(null);
+  const [stockTotalGainLossPercent, setStockTotalGainLossPercent] = useState(null);
+  
+  useEffect(() => {
+    const calculateStockGains = async () => {
+      let totalGain = 0;
+      let totalCost = 0;
+      
+      for (const stock of portfolio.stocks) {
+        const price = prices[stock.symbol] || 0;
+        if (price > 0) {
+          try {
+            const gl = await calculateGainLoss(stock, price, 'stock');
+            const value = calculateHoldingValue(stock, price, 'stock');
+            totalGain += gl;
+            totalCost += (value - gl);
+          } catch (error) {
+            console.error('Error calculating stock gain/loss:', error);
+          }
+        }
+      }
+      
+      setStockTotalGainLoss(totalGain);
+      setStockTotalGainLossPercent(totalCost > 0 ? (totalGain / totalCost) * 100 : 0);
+    };
+    
+    if (Object.keys(prices).length > 0) {
+      calculateStockGains();
+    }
+  }, [prices]);
+
+  // Calculate total gain/loss for crypto
+  const [cryptoTotalGainLoss, setCryptoTotalGainLoss] = useState(null);
+  const [cryptoTotalGainLossPercent, setCryptoTotalGainLossPercent] = useState(null);
+  
+  useEffect(() => {
+    const calculateCryptoGains = async () => {
+      let totalGain = 0;
+      let totalCost = 0;
+      
+      for (const crypto of portfolio.crypto) {
+        const price = prices[crypto.symbol] || 0;
+        if (price > 0) {
+          try {
+            const gl = await calculateGainLoss(crypto, price, 'crypto');
+            const value = calculateHoldingValue(crypto, price, 'crypto');
+            totalGain += gl;
+            totalCost += (value - gl);
+          } catch (error) {
+            console.error('Error calculating crypto gain/loss:', error);
+          }
+        }
+      }
+      
+      setCryptoTotalGainLoss(totalGain);
+      setCryptoTotalGainLossPercent(totalCost > 0 ? (totalGain / totalCost) * 100 : 0);
+    };
+    
+    if (Object.keys(prices).length > 0) {
+      calculateCryptoGains();
+    }
+  }, [prices]);
+
   return (
     <>
       <StatusBar style="light" backgroundColor="#0E1111" />
@@ -166,6 +230,13 @@ export default function App() {
                   <Text style={styles.cardValue}>
                     ¥{stockValue > 0 ? stockValue.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '0'}
                   </Text>
+                  {stockTotalGainLoss !== null && (
+                    <Text style={[styles.cardChange, { 
+                      color: stockTotalGainLoss >= 0 ? '#4CAF50' : '#F44336' 
+                    }]}>
+                      {stockTotalGainLoss >= 0 ? '+' : ''}¥{stockTotalGainLoss.toLocaleString('en-US', { maximumFractionDigits: 0 })} ({stockTotalGainLoss >= 0 ? '+' : ''}{stockTotalGainLossPercent.toFixed(2)}%)
+                    </Text>
+                  )}
                   <Text style={styles.cardPercentage}>
                     {totalValue > 0 ? ((stockValue / totalValue) * 100).toFixed(1) : 0}% of portfolio
                   </Text>
@@ -216,6 +287,13 @@ export default function App() {
                   <Text style={styles.cardValue}>
                     ¥{cryptoValue > 0 ? cryptoValue.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '0'}
                   </Text>
+                  {cryptoTotalGainLoss !== null && (
+                    <Text style={[styles.cardChange, { 
+                      color: cryptoTotalGainLoss >= 0 ? '#4CAF50' : '#F44336' 
+                    }]}>
+                      {cryptoTotalGainLoss >= 0 ? '+' : ''}¥{cryptoTotalGainLoss.toLocaleString('en-US', { maximumFractionDigits: 0 })} ({cryptoTotalGainLoss >= 0 ? '+' : ''}{cryptoTotalGainLossPercent.toFixed(2)}%)
+                    </Text>
+                  )}
                   <Text style={styles.cardPercentage}>
                     {totalValue > 0 ? ((cryptoValue / totalValue) * 100).toFixed(1) : 0}% of portfolio
                   </Text>
