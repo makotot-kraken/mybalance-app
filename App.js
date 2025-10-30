@@ -223,6 +223,24 @@ function Dashboard() {
               hasLegend={false}
               onDataPointClick={(data) => handlePiePress(pieChartData[data.index])}
             />
+            
+            {/* Interactive Legend */}
+            <View style={styles.legendContainer}>
+              {pieChartData.map((item, index) => (
+                <TouchableOpacity 
+                  key={item.name}
+                  style={styles.legendItem}
+                  onPress={() => handlePiePress(item)}
+                >
+                  <View style={[styles.legendColor, { backgroundColor: item.color }]} />
+                  <Text style={styles.legendText}>{item.name}</Text>
+                  <Text style={styles.legendValue}>
+                    ¥{item.value.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            
             {selectedSegment && (
               <View style={styles.segmentInfo}>
                 <TouchableOpacity 
@@ -363,6 +381,24 @@ function Stocks() {
               hasLegend={false}
               onDataPointClick={(data) => handlePiePress(stockPieChartData[data.index])}
             />
+            
+            {/* Interactive Legend */}
+            <View style={styles.legendContainer}>
+              {stockPieChartData.map((item, index) => (
+                <TouchableOpacity 
+                  key={item.name}
+                  style={styles.legendItem}
+                  onPress={() => handlePiePress(item)}
+                >
+                  <View style={[styles.legendColor, { backgroundColor: item.color }]} />
+                  <Text style={styles.legendText}>{item.name}</Text>
+                  <Text style={styles.legendValue}>
+                    ¥{item.value.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            
             {selectedSegment && (
               <View style={styles.segmentInfo}>
                 <TouchableOpacity 
@@ -659,6 +695,34 @@ const styles = StyleSheet.create({
     color: '#888',
   },
   cardPercentage: {
+    fontSize: 14,
+    color: '#888',
+  },
+  legendContainer: {
+    marginTop: 20,
+    width: '100%',
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    backgroundColor: '#1A1A1A',
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  legendColor: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    marginRight: 12,
+  },
+  legendText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#F5F5F5',
+    fontWeight: '500',
+  },
+  legendValue: {
     fontSize: 14,
     color: '#888',
   },
