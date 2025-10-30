@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { 
   portfolio, 
   fetchRealTimePrices, 
@@ -241,11 +240,9 @@ export default function App() {
                     {totalValue > 0 ? ((stockValue / totalValue) * 100).toFixed(1) : 0}% of portfolio
                   </Text>
                 </View>
-                <Ionicons 
-                  name={stocksExpanded ? "chevron-up" : "chevron-down"} 
-                  size={24} 
-                  color="#888" 
-                />
+                <Text style={styles.chevron}>
+                  {stocksExpanded ? "▲" : "▼"}
+                </Text>
               </View>
             </TouchableOpacity>
             
@@ -298,11 +295,9 @@ export default function App() {
                     {totalValue > 0 ? ((cryptoValue / totalValue) * 100).toFixed(1) : 0}% of portfolio
                   </Text>
                 </View>
-                <Ionicons 
-                  name={cryptoExpanded ? "chevron-up" : "chevron-down"} 
-                  size={24} 
-                  color="#888" 
-                />
+                <Text style={styles.chevron}>
+                  {cryptoExpanded ? "▲" : "▼"}
+                </Text>
               </View>
             </TouchableOpacity>
 
@@ -471,5 +466,10 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#00C853',
     borderRadius: 2,
+  },
+  chevron: {
+    fontSize: 20,
+    color: '#888',
+    fontWeight: 'bold',
   },
 });
