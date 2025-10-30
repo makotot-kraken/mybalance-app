@@ -162,7 +162,25 @@ export const fetchRealTimePrices = async () => {
       console.log('[JPY Prices] Metaplanet response status:', metaplanetResponse.status);
       const metaplanetData = await metaplanetResponse.json();
       console.log('[JPY Prices] Metaplanet data received:', metaplanetData);
-      if (metaplanetData && metaplanetData.price) {
+      
+      // If we got a fallback price (785) or error, try direct Yahoo Finance fetch
+      if (metaplanetData && metaplanetData.source === 'fallback') {
+        console.warn('[JPY Prices] Got fallback price, trying direct Yahoo Finance...');
+        try {
+          const yahooResponse = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/3350.T?interval=1d&range=1d');
+          const yahooData = await yahooResponse.json();
+          if (yahooData?.chart?.result?.[0]?.meta?.regularMarketPrice) {
+            const realPrice = yahooData.chart.result[0].meta.regularMarketPrice;
+            prices['3350.T'] = realPrice;
+            console.log('[JPY Prices] Metaplanet price from Yahoo Finance:', realPrice);
+          } else {
+            prices['3350.T'] = metaplanetData.price; // Use fallback
+          }
+        } catch (yahooError) {
+          console.error('[JPY Prices] Yahoo Finance direct fetch failed:', yahooError);
+          prices['3350.T'] = metaplanetData.price; // Use fallback
+        }
+      } else if (metaplanetData && metaplanetData.price) {
         prices['3350.T'] = metaplanetData.price;
         console.log('[JPY Prices] Metaplanet price set to:', metaplanetData.price);
       } else if (metaplanetData && metaplanetData.error) {
