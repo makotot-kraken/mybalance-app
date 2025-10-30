@@ -15,7 +15,10 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.mybalance.app",
-      "buildNumber": "1.0.0"
+      "buildNumber": "1.0.0",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -26,11 +29,21 @@
       "versionCode": 1
     },
     "web": {
-      "favicon": "./assets/icon.png"
+      "favicon": "./assets/icon.png",
+      "bundler": "metro",
+      "output": "single",
+      "name": "MyBalance",
+      "shortName": "MyBalance",
+      "description": "Personal Finance Portfolio Tracker",
+      "themeColor": "#0E1111",
+      "backgroundColor": "#0E1111",
+      "display": "standalone",
+      "orientation": "portrait",
+      "startUrl": "/"
     },
     "extra": {
       "eas": {
-        "projectId": "placeholder-for-eas"
+        "projectId": "c588401a-4499-4007-ad46-a1450ac99187"
       }
     }
   }

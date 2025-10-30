@@ -155,21 +155,22 @@ export const fetchRealTimePrices = async () => {
 
     await Promise.all(stockPromises);
 
-    // For Metaplanet, scrape directly from Yahoo Finance Japan
+    // For Metaplanet, use proxy server that scrapes Yahoo Finance Japan
     try {
-      console.log('[JPY Prices] Scraping Metaplanet price from Yahoo Finance Japan...');
-      const yahooResponse = await fetch('https://query1.finance.yahoo.com/v8/finance/chart/3350.T?interval=1d&range=1d');
-      const yahooData = await yahooResponse.json();
+      console.log('[JPY Prices] Fetching Metaplanet price from proxy...');
+      // Use proxy server deployed on Render
+      const proxyUrl = 'https://mybalance-price-proxy.onrender.com/api/metaplanet-price';
+      const metaplanetResponse = await fetch(proxyUrl);
+      const metaplanetData = await metaplanetResponse.json();
       
-      if (yahooData?.chart?.result?.[0]?.meta?.regularMarketPrice) {
-        const realPrice = yahooData.chart.result[0].meta.regularMarketPrice;
-        prices['3350.T'] = realPrice;
-        console.log('[JPY Prices] Metaplanet price scraped:', realPrice);
+      if (metaplanetData && metaplanetData.price) {
+        prices['3350.T'] = metaplanetData.price;
+        console.log('[JPY Prices] Metaplanet price:', metaplanetData.price);
       } else {
-        console.error('[JPY Prices] Failed to parse Yahoo Finance data for Metaplanet');
+        console.error('[JPY Prices] No price in response:', metaplanetData);
       }
     } catch (error) {
-      console.error('[JPY Prices] Yahoo Finance scraping failed for Metaplanet:', error);
+      console.error('[JPY Prices] Proxy fetch failed:', error);
     }
 
     priceCache = prices;
