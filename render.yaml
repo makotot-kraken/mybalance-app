@@ -4,8 +4,14 @@ services:
     env: node
     region: oregon
     plan: free
-    buildCommand: npm install
+    buildCommand: |
+      npm install --production=false
+      pip install requests
     startCommand: node api-server.js
     envVars:
       - key: NODE_ENV
         value: production
+      - key: NODE_OPTIONS
+        value: --no-warnings
+      - key: PYTHON_VERSION
+        value: 3.11
