@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, StyleSheet, ScrollView, RefreshControl, Dimensions } from 'react-native';
-import { PieChart } from 'react-native-chart-kit';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { 
   portfolio, 
   fetchRealTimePrices, 
@@ -13,8 +13,8 @@ import {
   stopKeepAlive
 } from './data/assets';
 
-// Holding Card Component with gain/loss
-function HoldingCard({ holding, price, displayPrice, currency, value, type }) {
+// Holding Card Component with gain/loss and percentage indicator
+function HoldingCard({ holding, price, displayPrice, currency, value, type, totalCategoryValue }) {
   const [gainLoss, setGainLoss] = useState(null);
   const [gainLossPercent, setGainLossPercent] = useState(null);
 
@@ -40,11 +40,19 @@ function HoldingCard({ holding, price, displayPrice, currency, value, type }) {
   const displayName = holding.name || holding.symbol;
   const displaySymbol = holding.symbol;
   const displayAmount = type === 'stock' ? `${holding.shares} shares` : `${holding.amount} ${holding.symbol}`;
+  
+  // Calculate percentage of category
+  const percentageOfCategory = totalCategoryValue > 0 ? ((value / totalCategoryValue) * 100) : 0;
 
   return (
     <View style={styles.holdingCard}>
       <View style={styles.cardLeft}>
-        <Text style={styles.cardTitle}>{displaySymbol}</Text>
+        <View style={styles.titleRow}>
+          <Text style={styles.cardTitle}>{displaySymbol}</Text>
+          <View style={styles.percentageBadge}>
+            <Text style={styles.percentageText}>{percentageOfCategory.toFixed(1)}%</Text>
+          </View>
+        </View>
         <Text style={styles.cardSubtitle}>{displayName}</Text>
         <Text style={styles.cardShares}>
           {displayAmount} @ {displayPrice > 0 ? `${currency}${displayPrice.toLocaleString('en-US', { maximumFractionDigits: 2 })}` : 'Loading...'}
@@ -60,6 +68,10 @@ function HoldingCard({ holding, price, displayPrice, currency, value, type }) {
           ) : 'Calculating...'}
         </Text>
       </View>
+      {/* Progress bar showing percentage */}
+      <View style={styles.progressBarContainer}>
+        <View style={[styles.progressBar, { width: `${percentageOfCategory}%` }]} />
+      </View>
     </View>
   );
 }
@@ -70,6 +82,8 @@ export default function App() {
   const [prices, setPrices] = useState({});
   const [usdPrices, setUsdPrices] = useState({});
   const [lastUpdate, setLastUpdate] = useState(new Date());
+  const [stocksExpanded, setStocksExpanded] = useState(false);
+  const [cryptoExpanded, setCryptoExpanded] = useState(false);
   
   const loadPrices = async () => {
     try {
@@ -117,26 +131,6 @@ export default function App() {
 
   const totalValue = stockValue + cryptoValue;
 
-  // Pie chart data
-  const pieChartData = totalValue > 0 ? [
-    {
-      name: 'Stocks',
-      value: stockValue,
-      color: '#4CAF50',
-      legendFontColor: '#F5F5F5',
-      legendFontSize: 14,
-    },
-    {
-      name: 'Crypto',
-      value: cryptoValue,
-      color: '#2196F3',
-      legendFontColor: '#F5F5F5',
-      legendFontSize: 14,
-    },
-  ] : [];
-
-  const screenWidth = Dimensions.get('window').width;
-
   return (
     <>
       <StatusBar style="light" backgroundColor="#0E1111" />
@@ -155,94 +149,108 @@ export default function App() {
           <Text style={styles.lastUpdate}>
             Last updated: {lastUpdate.toLocaleTimeString()}
           </Text>
-
-          {/* Pie Chart */}
-          {totalValue > 0 && (
-            <View style={styles.chartSection}>
-              <Text style={styles.sectionTitle}>Asset Distribution</Text>
-              <PieChart
-                data={pieChartData}
-                width={screenWidth - 40}
-                height={220}
-                chartConfig={{
-                  color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                }}
-                accessor="value"
-                backgroundColor="transparent"
-                paddingLeft="15"
-                absolute
-                hasLegend={true}
-              />
-            </View>
-          )}
           
-          {/* Portfolio Summary */}
+          {/* Portfolio Summary with Expandable Sections */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Portfolio Summary</Text>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Stocks ({portfolio.stocks.length} holdings)</Text>
-              <Text style={styles.cardValue}>
-                ¥{stockValue > 0 ? stockValue.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '0'}
-              </Text>
-              <Text style={styles.cardPercentage}>
-                {totalValue > 0 ? ((stockValue / totalValue) * 100).toFixed(1) : 0}% of portfolio
-              </Text>
-            </View>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Crypto ({portfolio.crypto.length} holding)</Text>
-              <Text style={styles.cardValue}>
-                ¥{cryptoValue > 0 ? cryptoValue.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '0'}
-              </Text>
-              <Text style={styles.cardPercentage}>
-                {totalValue > 0 ? ((cryptoValue / totalValue) * 100).toFixed(1) : 0}% of portfolio
-              </Text>
-            </View>
-          </View>
-
-          {/* Stock Holdings */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Stock Holdings</Text>
-            {portfolio.stocks.map((stock) => {
-              const price = prices[stock.symbol] || 0;
-              const usdPrice = usdPrices[stock.symbol] || 0;
-              const value = calculateHoldingValue(stock, price, 'stock');
-              const displayPrice = stock.symbol === '3350.T' ? price : usdPrice;
-              const currency = stock.symbol === '3350.T' ? '¥' : '$';
-              
-              return (
-                <HoldingCard 
-                  key={stock.symbol} 
-                  holding={stock} 
-                  price={price} 
-                  displayPrice={displayPrice}
-                  currency={currency}
-                  value={value}
-                  type="stock"
+            
+            {/* Stocks Section */}
+            <TouchableOpacity 
+              style={styles.expandableCard}
+              onPress={() => setStocksExpanded(!stocksExpanded)}
+              activeOpacity={0.7}
+            >
+              <View style={styles.cardHeader}>
+                <View style={styles.cardHeaderLeft}>
+                  <Text style={styles.cardTitle}>Stocks ({portfolio.stocks.length} holdings)</Text>
+                  <Text style={styles.cardValue}>
+                    ¥{stockValue > 0 ? stockValue.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '0'}
+                  </Text>
+                  <Text style={styles.cardPercentage}>
+                    {totalValue > 0 ? ((stockValue / totalValue) * 100).toFixed(1) : 0}% of portfolio
+                  </Text>
+                </View>
+                <Ionicons 
+                  name={stocksExpanded ? "chevron-up" : "chevron-down"} 
+                  size={24} 
+                  color="#888" 
                 />
-              );
-            })}
-          </View>
+              </View>
+            </TouchableOpacity>
+            
+            {/* Expanded Stock Holdings */}
+            {stocksExpanded && (
+              <View style={styles.expandedSection}>
+                {portfolio.stocks.map((stock) => {
+                  const price = prices[stock.symbol] || 0;
+                  const usdPrice = usdPrices[stock.symbol] || 0;
+                  const value = calculateHoldingValue(stock, price, 'stock');
+                  const displayPrice = stock.symbol === '3350.T' ? price : usdPrice;
+                  const currency = stock.symbol === '3350.T' ? '¥' : '$';
+                  
+                  return (
+                    <HoldingCard 
+                      key={stock.symbol} 
+                      holding={stock} 
+                      price={price} 
+                      displayPrice={displayPrice}
+                      currency={currency}
+                      value={value}
+                      type="stock"
+                      totalCategoryValue={stockValue}
+                    />
+                  );
+                })}
+              </View>
+            )}
 
-          {/* Crypto Holdings */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Crypto Holdings</Text>
-            {portfolio.crypto.map((crypto) => {
-              const price = prices[crypto.symbol] || 0;
-              const usdPrice = usdPrices[crypto.symbol] || 0;
-              const value = calculateHoldingValue(crypto, price, 'crypto');
-              
-              return (
-                <HoldingCard 
-                  key={crypto.symbol} 
-                  holding={crypto} 
-                  price={price} 
-                  displayPrice={usdPrice}
-                  currency="$"
-                  value={value}
-                  type="crypto"
+            {/* Crypto Section */}
+            <TouchableOpacity 
+              style={styles.expandableCard}
+              onPress={() => setCryptoExpanded(!cryptoExpanded)}
+              activeOpacity={0.7}
+            >
+              <View style={styles.cardHeader}>
+                <View style={styles.cardHeaderLeft}>
+                  <Text style={styles.cardTitle}>Crypto ({portfolio.crypto.length} holding)</Text>
+                  <Text style={styles.cardValue}>
+                    ¥{cryptoValue > 0 ? cryptoValue.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '0'}
+                  </Text>
+                  <Text style={styles.cardPercentage}>
+                    {totalValue > 0 ? ((cryptoValue / totalValue) * 100).toFixed(1) : 0}% of portfolio
+                  </Text>
+                </View>
+                <Ionicons 
+                  name={cryptoExpanded ? "chevron-up" : "chevron-down"} 
+                  size={24} 
+                  color="#888" 
                 />
-              );
-            })}
+              </View>
+            </TouchableOpacity>
+
+            {/* Expanded Crypto Holdings */}
+            {cryptoExpanded && (
+              <View style={styles.expandedSection}>
+                {portfolio.crypto.map((crypto) => {
+                  const price = prices[crypto.symbol] || 0;
+                  const usdPrice = usdPrices[crypto.symbol] || 0;
+                  const value = calculateHoldingValue(crypto, price, 'crypto');
+                  
+                  return (
+                    <HoldingCard 
+                      key={crypto.symbol} 
+                      holding={crypto} 
+                      price={price} 
+                      displayPrice={usdPrice}
+                      currency="$"
+                      value={value}
+                      type="crypto"
+                      totalCategoryValue={cryptoValue}
+                    />
+                  );
+                })}
+              </View>
+            )}
           </View>
         </View>
       </ScrollView>
@@ -286,42 +294,68 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 30,
   },
-  chartSection: {
-    marginBottom: 30,
-    alignItems: 'center',
-  },
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#F5F5F5',
     marginBottom: 16,
   },
-  card: {
+  expandableCard: {
     backgroundColor: '#1A1A1A',
-    padding: 16,
     borderRadius: 12,
     marginBottom: 12,
   },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+  },
+  cardHeaderLeft: {
+    flex: 1,
+  },
+  expandedSection: {
+    paddingHorizontal: 8,
+    paddingBottom: 8,
+  },
   holdingCard: {
-    backgroundColor: '#1A1A1A',
+    backgroundColor: '#0E1111',
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    position: 'relative',
   },
   cardLeft: {
     flex: 1,
+    marginBottom: 8,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
   },
   cardRight: {
     alignItems: 'flex-end',
+    position: 'absolute',
+    right: 16,
+    top: 16,
   },
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#F5F5F5',
-    marginBottom: 4,
+    marginRight: 8,
+  },
+  percentageBadge: {
+    backgroundColor: '#00C853',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+  },
+  percentageText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#FFF',
   },
   cardSubtitle: {
     fontSize: 14,
@@ -346,5 +380,18 @@ const styles = StyleSheet.create({
   cardPercentage: {
     fontSize: 14,
     color: '#888',
+    marginTop: 4,
+  },
+  progressBarContainer: {
+    height: 4,
+    backgroundColor: '#333',
+    borderRadius: 2,
+    marginTop: 12,
+    overflow: 'hidden',
+  },
+  progressBar: {
+    height: '100%',
+    backgroundColor: '#00C853',
+    borderRadius: 2,
   },
 });
