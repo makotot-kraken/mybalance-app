@@ -158,8 +158,8 @@ export const fetchRealTimePrices = async () => {
     // For Metaplanet, use proxy server that scrapes Yahoo Finance Japan
     try {
       console.log('[JPY Prices] Fetching Metaplanet price from proxy...');
-      // Use Vercel serverless function
-      const proxyUrl = 'https://mybalance-k14s6busq-makototamura-9785s-projects.vercel.app/api/metaplanet-price';
+      // Use Render deployment
+      const proxyUrl = 'https://mybalance-app.onrender.com/api/metaplanet-price';
       const metaplanetResponse = await fetch(proxyUrl);
       const metaplanetData = await metaplanetResponse.json();
       
