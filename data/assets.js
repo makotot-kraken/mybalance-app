@@ -24,9 +24,9 @@ export const portfolio = {
       exchange: 'NASDAQ',
     },
     {
-      symbol: 'AAPL',
-      name: 'Apple',
-      shares: 16,
+      symbol: 'CRWV',
+      name: 'CrowdStrike',
+      shares: 43,
       exchange: 'NASDAQ',
     },
     {
@@ -136,7 +136,7 @@ export const fetchRealTimePrices = async () => {
     }
 
     // Fetch US stock prices using Finnhub API
-    const stockSymbols = ['TSLA', 'NVDA', 'AAPL', 'GOOGL', 'NFLX', 'TTWO', 'PYPL', 'RXRX'];
+    const stockSymbols = ['TSLA', 'NVDA', 'CRWV', 'GOOGL', 'NFLX', 'TTWO', 'PYPL', 'RXRX'];
     
     const stockPromises = stockSymbols.map(async (symbol) => {
       try {
@@ -199,7 +199,7 @@ export const fetchUSDPrices = async () => {
     }
 
     // Fetch US stock prices using Finnhub API (keep in USD)
-    const stockSymbols = ['TSLA', 'NVDA', 'AAPL', 'GOOGL', 'NFLX', 'TTWO', 'PYPL', 'RXRX'];
+    const stockSymbols = ['TSLA', 'NVDA', 'CRWV', 'GOOGL', 'NFLX', 'TTWO', 'PYPL', 'RXRX'];
     
     const stockPromises = stockSymbols.map(async (symbol) => {
       try {
@@ -284,7 +284,7 @@ export const calculateGainLoss = async (holding, currentPrice, type = 'stock') =
     'BTCUSDT': 16487344,      // JPY - ¥600,000 total / 0.03639155 BTC = ¥16,487,344 per BTC
     'TSLA': 289.82,           // USD - (288.48*48+298.7*7.2131)/55.2131
     'NVDA': 116.35,           // USD - Your actual cost
-    'AAPL': 255.31,           // USD - (227.05*4+264.73*12)/16
+    'CRWV': 106.75,           // USD - Your actual cost
     'GOOGL': 160.31,          // USD - Your corrected actual cost
     'NFLX': 335.09,           // USD - Your actual cost
     'TTWO': 108.02,           // USD - Your actual cost
@@ -316,7 +316,7 @@ export const calculateGainLossPercentage = async (holding, currentPrice, type = 
     'BTCUSDT': 16487344,      // JPY - ¥600,000 total / 0.03639155 BTC = ¥16,487,344 per BTC
     'TSLA': 289.82,           // USD - (288.48*48+298.7*7.2131)/55.2131
     'NVDA': 116.35,           // USD - Your actual cost
-    'AAPL': 255.31,           // USD - (227.05*4+264.73*12)/16
+    'CRWV': 106.75,           // USD - Your actual cost
     'GOOGL': 160.31,          // USD - Your corrected actual cost
     'NFLX': 335.09,           // USD - Your actual cost
     'TTWO': 108.02,           // USD - Your actual cost
