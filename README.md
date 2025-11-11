@@ -55,9 +55,9 @@ The app uses hardcoded data from `data/assets.js`:
 {
   cash: 800000,
   stocks: [
-    { symbol: "AAPL", name: "Apple", shares: 10, avgPrice: 180, currentPrice: 190 },
-    { symbol: "TSLA", name: "Tesla", shares: 5, avgPrice: 250, currentPrice: 220 },
-    { symbol: "NVDA", name: "NVIDIA", shares: 3, avgPrice: 400, currentPrice: 480 }
+    { symbol: "CRWV", name: "CrowdStrike", shares: 43, avgPrice: 106.75, currentPrice: 335 },
+    { symbol: "TSLA", name: "Tesla", shares: 55.2131, avgPrice: 289.82, currentPrice: 248 },
+    { symbol: "NVDA", name: "NVIDIA", shares: 58, avgPrice: 116.35, currentPrice: 142 }
   ],
   crypto: [
     { symbol: "BTC", name: "Bitcoin", amount: 0.3, currentPrice: 6500000 },
