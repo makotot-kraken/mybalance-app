@@ -215,9 +215,16 @@ export const fetchRealTimePrices = async () => {
     // For Metaplanet, use proxy server that scrapes Yahoo Finance Japan
     try {
       console.log('[JPY Prices] Fetching Metaplanet price from proxy...');
-      // Use Render deployment
+      // Use Render deployment with timeout
       const proxyUrl = 'https://mybalance-app.onrender.com/api/metaplanet-price';
-      const metaplanetResponse = await fetch(proxyUrl);
+      
+      // Create fetch with timeout (10 seconds)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      
+      const metaplanetResponse = await fetch(proxyUrl, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      
       const metaplanetData = await metaplanetResponse.json();
       
       if (metaplanetData && metaplanetData.price) {
@@ -228,13 +235,19 @@ export const fetchRealTimePrices = async () => {
         // Use stored price if available
         if (prices['3350.T']) {
           newPrices['3350.T'] = prices['3350.T'];
+          console.log('[JPY Prices] Using cached Metaplanet price:', prices['3350.T']);
         }
       }
     } catch (error) {
-      console.error('[JPY Prices] Proxy fetch failed:', error);
+      if (error.name === 'AbortError') {
+        console.error('[JPY Prices] Metaplanet fetch timed out (service may be sleeping)');
+      } else {
+        console.error('[JPY Prices] Proxy fetch failed:', error);
+      }
       // Use stored price if available
       if (prices['3350.T']) {
         newPrices['3350.T'] = prices['3350.T'];
+        console.log('[JPY Prices] Using cached Metaplanet price:', prices['3350.T']);
       }
     }
 
@@ -323,7 +336,14 @@ export const fetchUSDPrices = async () => {
     // For Metaplanet, fetch from our API server (already in JPY)
     try {
       console.log('[USD Prices] Fetching Metaplanet price from API...');
-      const metaplanetResponse = await fetch(API_CONFIG.METAPLANET_API_URL);
+      
+      // Create fetch with timeout (10 seconds)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      
+      const metaplanetResponse = await fetch(API_CONFIG.METAPLANET_API_URL, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      
       console.log('[USD Prices] Metaplanet response status:', metaplanetResponse.status);
       const metaplanetData = await metaplanetResponse.json();
       console.log('[USD Prices] Metaplanet data received:', metaplanetData);
@@ -335,19 +355,26 @@ export const fetchUSDPrices = async () => {
         // Use stored price if available
         if (prices['3350.T']) {
           newPrices['3350.T'] = prices['3350.T'];
+          console.log('[USD Prices] Using cached Metaplanet price:', prices['3350.T']);
         }
       } else {
         console.warn('[USD Prices] Metaplanet data has no price:', metaplanetData);
         // Use stored price if available
         if (prices['3350.T']) {
           newPrices['3350.T'] = prices['3350.T'];
+          console.log('[USD Prices] Using cached Metaplanet price:', prices['3350.T']);
         }
       }
     } catch (error) {
-      console.error('[USD Prices] Metaplanet API failed:', error);
+      if (error.name === 'AbortError') {
+        console.error('[USD Prices] Metaplanet fetch timed out (service may be sleeping)');
+      } else {
+        console.error('[USD Prices] Metaplanet API failed:', error);
+      }
       // Use stored price if available
       if (prices['3350.T']) {
         newPrices['3350.T'] = prices['3350.T'];
+        console.log('[USD Prices] Using cached Metaplanet price:', prices['3350.T']);
       }
     }
 
