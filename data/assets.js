@@ -79,6 +79,38 @@ let exchangeRateCache = {};
 let lastExchangeRateFetch = 0;
 const EXCHANGE_RATE_CACHE_DURATION = 600000; // 10 minutes cache
 
+// Persistent storage keys
+const STORAGE_KEYS = {
+  JPY_PRICES: 'mybalance_jpy_prices',
+  USD_PRICES: 'mybalance_usd_prices',
+  EXCHANGE_RATE: 'mybalance_exchange_rate',
+  LAST_UPDATE: 'mybalance_last_update'
+};
+
+// Helper functions for localStorage
+const saveToStorage = (key, data) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (error) {
+    console.warn('Failed to save to localStorage:', error);
+  }
+};
+
+const loadFromStorage = (key) => {
+  try {
+    const data = localStorage.getItem(key);
+    return data ? JSON.parse(data) : null;
+  } catch (error) {
+    console.warn('Failed to load from localStorage:', error);
+    return null;
+  }
+};
+
+// Get last update timestamp
+export const getLastUpdateTime = () => {
+  return loadFromStorage(STORAGE_KEYS.LAST_UPDATE) || null;
+};
+
 // API Configuration
 const FINNHUB_API_KEY = 'd3l0u2pr01qp3ucpv4d0d3l0u2pr01qp3ucpv4dg';
 const TWELVE_DATA_API_KEY = '382cbb49fde847459dc8816de78bd3a7';
@@ -99,6 +131,10 @@ export const fetchExchangeRate = async () => {
       const rate = parseFloat(data.price);
       exchangeRateCache.USDJPY = rate;
       lastExchangeRateFetch = now;
+      
+      // Save to localStorage for persistent fallback
+      saveToStorage(STORAGE_KEYS.EXCHANGE_RATE, { rate, timestamp: now });
+      
       console.log(`Updated USD/JPY rate: ${rate}`);
       return rate;
     } else {
@@ -106,8 +142,17 @@ export const fetchExchangeRate = async () => {
     }
   } catch (error) {
     console.error('Error fetching exchange rate:', error);
-    // Fallback rate if API fails
-    return exchangeRateCache.USDJPY || 150; // Reasonable fallback
+    
+    // Try to get from localStorage first
+    const stored = loadFromStorage(STORAGE_KEYS.EXCHANGE_RATE);
+    if (stored && stored.rate) {
+      console.log('Using stored exchange rate:', stored.rate);
+      exchangeRateCache.USDJPY = stored.rate;
+      return stored.rate;
+    }
+    
+    // Ultimate fallback rate if nothing is available
+    return exchangeRateCache.USDJPY || 150;
   }
 };
 
@@ -118,8 +163,12 @@ export const fetchRealTimePrices = async () => {
     return priceCache;
   }
 
+  // Load stored prices as initial fallback
+  const storedPrices = loadFromStorage(STORAGE_KEYS.JPY_PRICES);
+  let prices = storedPrices?.prices || {};
+
   try {
-    const prices = {};
+    const newPrices = {};
     
     // Fetch exchange rate first
     const usdToJpy = await fetchExchangeRate();
@@ -129,10 +178,15 @@ export const fetchRealTimePrices = async () => {
       const cryptoResponse = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
       const cryptoData = await cryptoResponse.json();
       const btcUsd = parseFloat(cryptoData.price);
-      prices['BTCUSDT'] = btcUsd * usdToJpy; // Convert to JPY
+      if (!isNaN(btcUsd)) {
+        newPrices['BTCUSDT'] = btcUsd * usdToJpy; // Convert to JPY
+      }
     } catch (error) {
       console.error('Crypto price fetch failed:', error);
-      // No fallback - let it show as 0 or error
+      // Keep stored price if available
+      if (prices['BTCUSDT']) {
+        newPrices['BTCUSDT'] = prices['BTCUSDT'];
+      }
     }
 
     // Fetch US stock prices using Finnhub API
@@ -143,13 +197,16 @@ export const fetchRealTimePrices = async () => {
         const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_API_KEY}`);
         const data = await response.json();
         if (data && data.c && typeof data.c === 'number') {
-          prices[symbol] = data.c * usdToJpy; // Convert USD to JPY
+          newPrices[symbol] = data.c * usdToJpy; // Convert USD to JPY
         } else {
           throw new Error(`Invalid data for ${symbol}`);
         }
       } catch (error) {
         console.error(`Failed to fetch ${symbol} from Finnhub:`, error);
-        // No fallback - let it show as 0 or error
+        // Use stored price if available
+        if (prices[symbol]) {
+          newPrices[symbol] = prices[symbol];
+        }
       }
     });
 
@@ -164,38 +221,80 @@ export const fetchRealTimePrices = async () => {
       const metaplanetData = await metaplanetResponse.json();
       
       if (metaplanetData && metaplanetData.price) {
-        prices['3350.T'] = metaplanetData.price;
+        newPrices['3350.T'] = metaplanetData.price;
         console.log('[JPY Prices] Metaplanet price:', metaplanetData.price);
       } else {
         console.error('[JPY Prices] No price in response:', metaplanetData);
+        // Use stored price if available
+        if (prices['3350.T']) {
+          newPrices['3350.T'] = prices['3350.T'];
+        }
       }
     } catch (error) {
       console.error('[JPY Prices] Proxy fetch failed:', error);
+      // Use stored price if available
+      if (prices['3350.T']) {
+        newPrices['3350.T'] = prices['3350.T'];
+      }
     }
 
-    priceCache = prices;
-    lastFetchTime = now;
-    return prices;
+    // If we got any new prices, update cache and storage
+    if (Object.keys(newPrices).length > 0) {
+      priceCache = newPrices;
+      lastFetchTime = now;
+      
+      // Save to localStorage with timestamp
+      saveToStorage(STORAGE_KEYS.JPY_PRICES, { prices: newPrices, timestamp: now });
+      saveToStorage(STORAGE_KEYS.LAST_UPDATE, now);
+      
+      return newPrices;
+    }
+
+    // If no new prices but we have stored prices, use those
+    if (Object.keys(prices).length > 0) {
+      console.log('Using stored prices from localStorage');
+      priceCache = prices;
+      return prices;
+    }
+
+    return {};
 
   } catch (error) {
     console.error('Error fetching prices:', error);
-    return {};  // Return empty object - no fallbacks
+    
+    // Return stored prices if available
+    if (Object.keys(prices).length > 0) {
+      console.log('Using stored prices due to error');
+      return prices;
+    }
+    
+    return {};
   }
 };
 
 // Function to fetch real-time prices in original USD (for display purposes)
 export const fetchUSDPrices = async () => {
+  // Load stored prices as initial fallback
+  const storedPrices = loadFromStorage(STORAGE_KEYS.USD_PRICES);
+  let prices = storedPrices?.prices || {};
+  
   try {
-    const prices = {};
+    const newPrices = {};
     
     // Fetch crypto prices from Binance API (keep in USD)
     try {
       const cryptoResponse = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
       const cryptoData = await cryptoResponse.json();
-      prices['BTCUSDT'] = parseFloat(cryptoData.price);
+      const btcUsd = parseFloat(cryptoData.price);
+      if (!isNaN(btcUsd)) {
+        newPrices['BTCUSDT'] = btcUsd;
+      }
     } catch (error) {
       console.error('Crypto price fetch failed:', error);
-      // No fallback
+      // Keep stored price if available
+      if (prices['BTCUSDT']) {
+        newPrices['BTCUSDT'] = prices['BTCUSDT'];
+      }
     }
 
     // Fetch US stock prices using Finnhub API (keep in USD)
@@ -206,13 +305,16 @@ export const fetchUSDPrices = async () => {
         const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${FINNHUB_API_KEY}`);
         const data = await response.json();
         if (data && data.c && typeof data.c === 'number') {
-          prices[symbol] = data.c; // Keep in USD
+          newPrices[symbol] = data.c; // Keep in USD
         } else {
           throw new Error(`Invalid data for ${symbol}`);
         }
       } catch (error) {
         console.error(`Failed to fetch ${symbol} from Finnhub:`, error);
-        // No fallback
+        // Use stored price if available
+        if (prices[symbol]) {
+          newPrices[symbol] = prices[symbol];
+        }
       }
     });
 
@@ -226,22 +328,53 @@ export const fetchUSDPrices = async () => {
       const metaplanetData = await metaplanetResponse.json();
       console.log('[USD Prices] Metaplanet data received:', metaplanetData);
       if (metaplanetData && metaplanetData.price) {
-        prices['3350.T'] = metaplanetData.price; // Already in JPY
+        newPrices['3350.T'] = metaplanetData.price; // Already in JPY
         console.log('[USD Prices] Metaplanet price set to:', metaplanetData.price);
       } else if (metaplanetData && metaplanetData.error) {
         console.error('[USD Prices] Metaplanet API returned error:', metaplanetData.error);
+        // Use stored price if available
+        if (prices['3350.T']) {
+          newPrices['3350.T'] = prices['3350.T'];
+        }
       } else {
         console.warn('[USD Prices] Metaplanet data has no price:', metaplanetData);
+        // Use stored price if available
+        if (prices['3350.T']) {
+          newPrices['3350.T'] = prices['3350.T'];
+        }
       }
     } catch (error) {
       console.error('[USD Prices] Metaplanet API failed:', error);
+      // Use stored price if available
+      if (prices['3350.T']) {
+        newPrices['3350.T'] = prices['3350.T'];
+      }
     }
 
-    return prices;
+    // If we got any new prices, save to storage
+    if (Object.keys(newPrices).length > 0) {
+      saveToStorage(STORAGE_KEYS.USD_PRICES, { prices: newPrices, timestamp: Date.now() });
+      return newPrices;
+    }
+
+    // If no new prices but we have stored prices, use those
+    if (Object.keys(prices).length > 0) {
+      console.log('Using stored USD prices from localStorage');
+      return prices;
+    }
+
+    return {};
 
   } catch (error) {
     console.error('Error fetching USD prices:', error);
-    return {};  // Return empty object - no fallbacks
+    
+    // Return stored prices if available
+    if (Object.keys(prices).length > 0) {
+      console.log('Using stored USD prices due to error');
+      return prices;
+    }
+    
+    return {};
   }
 };
 

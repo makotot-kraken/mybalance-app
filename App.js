@@ -9,7 +9,8 @@ import {
   calculateGainLoss,
   calculateGainLossPercentage,
   startKeepAlive,
-  stopKeepAlive
+  stopKeepAlive,
+  getLastUpdateTime
 } from './data/assets';
 
 // Holding Card Component with gain/loss and percentage indicator
@@ -93,7 +94,11 @@ export default function App() {
       ]);
       setPrices(priceData);
       setUsdPrices(usdPriceData);
-      setLastUpdate(new Date());
+      
+      // Update last update time from storage or current time
+      const storedTime = getLastUpdateTime();
+      setLastUpdate(storedTime ? new Date(storedTime) : new Date());
+      
       console.log('[App] Prices loaded');
     } catch (error) {
       console.error('[App] Error loading prices:', error);
@@ -210,8 +215,13 @@ export default function App() {
             ¥{totalValue > 0 ? totalValue.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '0'}
           </Text>
           <Text style={styles.lastUpdate}>
-            Last updated: {lastUpdate.toLocaleTimeString()}
+            Last updated: {lastUpdate.toLocaleDateString()} {lastUpdate.toLocaleTimeString()}
           </Text>
+          {lastUpdate && (Date.now() - lastUpdate.getTime() > 3600000) && (
+            <Text style={styles.cacheNotice}>
+              ⚠️ Data may be cached (APIs inactive)
+            </Text>
+          )}
           
           {/* Portfolio Summary with Expandable Sections */}
           <View style={styles.section}>
@@ -362,7 +372,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
     textAlign: 'center',
-    marginBottom: 30,
+    marginBottom: 8,
+  },
+  cacheNotice: {
+    fontSize: 11,
+    color: '#FFA726',
+    textAlign: 'center',
+    marginBottom: 24,
+    fontStyle: 'italic',
   },
   section: {
     marginBottom: 30,
