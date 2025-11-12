@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity, Dimensions } from 'react-native';
+import { LineChart } from 'react-native-chart-kit';
 import { 
   portfolio, 
   fetchRealTimePrices, 
@@ -12,6 +13,9 @@ import {
   stopKeepAlive,
   getLastUpdateTime
 } from './data/assets';
+
+// Import portfolio history
+import portfolioHistory from './data/portfolio-history.json';
 
 // Holding Card Component with gain/loss and percentage indicator
 function HoldingCard({ holding, price, displayPrice, currency, value, type, totalCategoryValue }) {
@@ -223,6 +227,85 @@ export default function App() {
             </Text>
           )}
           
+          {/* Historical Portfolio Chart */}
+          {portfolioHistory && portfolioHistory.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Portfolio History</Text>
+              <View style={styles.chartContainer}>
+                <LineChart
+                  data={{
+                    labels: portfolioHistory.slice(-30).map((item, index) => {
+                      // Show every 5th date to avoid crowding
+                      if (index % 5 === 0) {
+                        const date = new Date(item.date);
+                        return `${date.getMonth() + 1}/${date.getDate()}`;
+                      }
+                      return '';
+                    }),
+                    datasets: [
+                      {
+                        data: portfolioHistory.slice(-30).map(item => item.stockValue / 1000), // Show in thousands
+                        color: (opacity = 1) => `rgba(76, 175, 80, ${opacity})`, // Green for stocks
+                        strokeWidth: 2,
+                      },
+                      {
+                        data: portfolioHistory.slice(-30).map(item => item.cryptoValue / 1000), // Show in thousands
+                        color: (opacity = 1) => `rgba(33, 150, 243, ${opacity})`, // Blue for crypto
+                        strokeWidth: 2,
+                      },
+                      {
+                        data: portfolioHistory.slice(-30).map(item => item.totalValue / 1000), // Show in thousands
+                        color: (opacity = 1) => `rgba(255, 193, 7, ${opacity})`, // Yellow for total
+                        strokeWidth: 3,
+                      },
+                    ],
+                    legend: ['Stocks', 'Crypto', 'Total'],
+                  }}
+                  width={Dimensions.get('window').width - 40}
+                  height={220}
+                  chartConfig={{
+                    backgroundColor: '#1A1A1A',
+                    backgroundGradientFrom: '#1A1A1A',
+                    backgroundGradientTo: '#1A1A1A',
+                    decimalPlaces: 0,
+                    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                    labelColor: (opacity = 1) => `rgba(136, 136, 136, ${opacity})`,
+                    style: {
+                      borderRadius: 16,
+                    },
+                    propsForDots: {
+                      r: '3',
+                      strokeWidth: '2',
+                    },
+                  }}
+                  bezier
+                  style={{
+                    marginVertical: 8,
+                    borderRadius: 16,
+                  }}
+                  formatYLabel={(value) => `¥${value}K`}
+                />
+                <View style={styles.legendContainer}>
+                  <View style={styles.legendRow}>
+                    <View style={[styles.legendDot, { backgroundColor: '#4CAF50' }]} />
+                    <Text style={styles.legendLabel}>Stocks</Text>
+                  </View>
+                  <View style={styles.legendRow}>
+                    <View style={[styles.legendDot, { backgroundColor: '#2196F3' }]} />
+                    <Text style={styles.legendLabel}>Crypto</Text>
+                  </View>
+                  <View style={styles.legendRow}>
+                    <View style={[styles.legendDot, { backgroundColor: '#FFC107' }]} />
+                    <Text style={styles.legendLabel}>Total</Text>
+                  </View>
+                </View>
+                <Text style={styles.chartNote}>
+                  Last 30 days • Values in thousands (K) • Updated daily at 6am JST
+                </Text>
+              </View>
+            </View>
+          )}
+          
           {/* Portfolio Summary with Expandable Sections */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Portfolio Summary</Text>
@@ -389,6 +472,34 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#F5F5F5',
     marginBottom: 16,
+  },
+  chartContainer: {
+    backgroundColor: '#1A1A1A',
+    borderRadius: 16,
+    padding: 16,
+    alignItems: 'center',
+  },
+  legendRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  legendDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: 6,
+  },
+  legendLabel: {
+    fontSize: 12,
+    color: '#F5F5F5',
+  },
+  chartNote: {
+    fontSize: 11,
+    color: '#666',
+    textAlign: 'center',
+    marginTop: 12,
+    fontStyle: 'italic',
   },
   expandableCard: {
     backgroundColor: '#1A1A1A',
