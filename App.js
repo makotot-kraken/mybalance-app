@@ -342,26 +342,31 @@ export default function App() {
             {/* Expanded Stock Holdings */}
             {stocksExpanded && (
               <View style={styles.expandedSection}>
-                {portfolio.stocks.map((stock) => {
-                  const price = prices[stock.symbol] || 0;
-                  const usdPrice = usdPrices[stock.symbol] || 0;
-                  const value = calculateHoldingValue(stock, price, 'stock');
-                  const displayPrice = stock.symbol === '3350.T' ? price : usdPrice;
-                  const currency = stock.symbol === '3350.T' ? '¥' : '$';
-                  
-                  return (
-                    <HoldingCard 
-                      key={stock.symbol} 
-                      holding={stock} 
-                      price={price} 
-                      displayPrice={displayPrice}
-                      currency={currency}
-                      value={value}
-                      type="stock"
-                      totalCategoryValue={stockValue}
-                    />
-                  );
-                })}
+                {portfolio.stocks
+                  .map((stock) => {
+                    const price = prices[stock.symbol] || 0;
+                    const value = calculateHoldingValue(stock, price, 'stock');
+                    return { stock, price, value };
+                  })
+                  .sort((a, b) => b.value - a.value) // Sort by value (highest to lowest)
+                  .map(({ stock, price, value }) => {
+                    const usdPrice = usdPrices[stock.symbol] || 0;
+                    const displayPrice = stock.symbol === '3350.T' ? price : usdPrice;
+                    const currency = stock.symbol === '3350.T' ? '¥' : '$';
+                    
+                    return (
+                      <HoldingCard 
+                        key={stock.symbol} 
+                        holding={stock} 
+                        price={price} 
+                        displayPrice={displayPrice}
+                        currency={currency}
+                        value={value}
+                        type="stock"
+                        totalCategoryValue={stockValue}
+                      />
+                    );
+                  })}
               </View>
             )}
 
