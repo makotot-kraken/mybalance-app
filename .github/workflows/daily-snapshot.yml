@@ -6,6 +6,9 @@ on:
     - cron: '0 21 * * *'
   workflow_dispatch: # Allows manual trigger for testing
 
+permissions:
+  contents: write
+
 jobs:
   snapshot:
     runs-on: ubuntu-latest
