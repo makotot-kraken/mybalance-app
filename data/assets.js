@@ -196,7 +196,7 @@ export const fetchRealTimePrices = async () => {
     }
 
     // Fetch US stock prices using Finnhub API
-    const stockSymbols = ['TSLA', 'NVDA', 'CRWV', 'GOOGL', 'NFLX', 'TTWO', 'PYPL', 'RXRX'];
+    const stockSymbols = ['TSLA', 'NVDA', 'CRWV', 'GOOGL', 'NFLX', 'TTWO', 'PYPL', 'RXRX', 'RKLB'];
     
     const stockPromises = stockSymbols.map(async (symbol) => {
       try {
@@ -317,7 +317,7 @@ export const fetchUSDPrices = async () => {
     }
 
     // Fetch US stock prices using Finnhub API (keep in USD)
-    const stockSymbols = ['TSLA', 'NVDA', 'CRWV', 'GOOGL', 'NFLX', 'TTWO', 'PYPL', 'RXRX'];
+    const stockSymbols = ['TSLA', 'NVDA', 'CRWV', 'GOOGL', 'NFLX', 'TTWO', 'PYPL', 'RXRX', 'RKLB'];
     
     const stockPromises = stockSymbols.map(async (symbol) => {
       try {
