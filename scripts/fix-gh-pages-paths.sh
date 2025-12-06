@@ -10,4 +10,7 @@ sed -i.bak 's|src="/_expo/|src="./_expo/|g' docs/index.html
 # Remove backup file
 rm -f docs/index.html.bak
 
+# Ensure .nojekyll exists (required for GitHub Pages to serve _expo directory)
+touch docs/.nojekyll
+
 echo "✅ Paths fixed successfully!"
