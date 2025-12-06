@@ -76,7 +76,7 @@ const portfolio = {
 const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY || 'd3l0u2pr01qp3ucpv4d0d3l0u2pr01qp3ucpv4dg';
 const TWELVE_DATA_API_KEY = process.env.TWELVE_DATA_API_KEY || '382cbb49fde847459dc8816de78bd3a7';
 
-async function fetchWithTimeout(url, timeout = 10000) {
+async function fetchWithTimeout(url, timeout = 30000) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
   
