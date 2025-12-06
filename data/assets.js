@@ -60,6 +60,12 @@ export const portfolio = {
       exchange: 'NASDAQ',
     },
     {
+      symbol: 'RKLB',
+      name: 'Rocket Lab',
+      shares: 54,
+      exchange: 'NASDAQ',
+    },
+    {
       symbol: '3350.T',
       name: 'Metaplanet',
       shares: 1400,
@@ -450,6 +456,7 @@ export const calculateGainLoss = async (holding, currentPrice, type = 'stock') =
     'TTWO': 108.02,           // USD - Your actual cost
     'PYPL': 71.73,            // USD - Your actual cost
     'RXRX': 5.65,             // USD - Your actual cost
+    'RKLB': 40.69,            // USD - Your actual cost
     '3350.T': 946,            // JPY - Your actual cost in JPY
   };
   
@@ -482,6 +489,7 @@ export const calculateGainLossPercentage = async (holding, currentPrice, type = 
     'TTWO': 108.02,           // USD - Your actual cost
     'PYPL': 71.73,            // USD - Your actual cost
     'RXRX': 5.65,             // USD - Your actual cost
+    'RKLB': 40.69,            // USD - Your actual cost
     '3350.T': 946,            // JPY - Your actual cost in JPY
   };
   

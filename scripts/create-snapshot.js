@@ -64,6 +64,12 @@ const portfolio = {
       exchange: 'NASDAQ',
     },
     {
+      symbol: 'RKLB',
+      name: 'Rocket Lab',
+      shares: 54,
+      exchange: 'NASDAQ',
+    },
+    {
       symbol: '3350.T',
       name: 'Metaplanet',
       shares: 1400,
@@ -160,7 +166,7 @@ async function createSnapshot() {
   
   // Fetch stock prices
   let stockValue = 0;
-  const stockSymbols = ['TSLA', 'NVDA', 'CRWV', 'GOOGL', 'NFLX', 'TTWO', 'PYPL', 'RXRX'];
+  const stockSymbols = ['TSLA', 'NVDA', 'CRWV', 'GOOGL', 'NFLX', 'TTWO', 'PYPL', 'RXRX', 'RKLB'];
   
   for (const stock of portfolio.stocks) {
     if (stock.symbol === '3350.T') {
