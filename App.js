@@ -244,17 +244,17 @@ export default function App() {
                     }),
                     datasets: [
                       {
-                        data: portfolioHistory.slice(-30).map(item => item.stockValue / 1000), // Show in thousands
+                        data: portfolioHistory.slice(-30).map(item => item.stockValue / 1000000), // Show in millions
                         color: (opacity = 1) => `rgba(76, 175, 80, ${opacity})`, // Green for stocks
                         strokeWidth: 2,
                       },
                       {
-                        data: portfolioHistory.slice(-30).map(item => item.cryptoValue / 1000), // Show in thousands
+                        data: portfolioHistory.slice(-30).map(item => item.cryptoValue / 1000000), // Show in millions
                         color: (opacity = 1) => `rgba(33, 150, 243, ${opacity})`, // Blue for crypto
                         strokeWidth: 2,
                       },
                       {
-                        data: portfolioHistory.slice(-30).map(item => item.totalValue / 1000), // Show in thousands
+                        data: portfolioHistory.slice(-30).map(item => item.totalValue / 1000000), // Show in millions
                         color: (opacity = 1) => `rgba(255, 193, 7, ${opacity})`, // Yellow for total
                         strokeWidth: 3,
                       },
@@ -283,7 +283,7 @@ export default function App() {
                     marginVertical: 8,
                     borderRadius: 16,
                   }}
-                  formatYLabel={(value) => `¥${value}K`}
+                  formatYLabel={(value) => `¥${value}M`}
                 />
                 <View style={styles.legendContainer}>
                   <View style={styles.legendRow}>
@@ -300,7 +300,7 @@ export default function App() {
                   </View>
                 </View>
                 <Text style={styles.chartNote}>
-                  Last 30 days • Values in thousands (K) • Updated daily at 6am JST
+                  Last 30 days • Values in millions (M) • Updated daily at 6am JST
                 </Text>
               </View>
             </View>
