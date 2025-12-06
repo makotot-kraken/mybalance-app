@@ -38,7 +38,7 @@ export const portfolio = {
     {
       symbol: 'NFLX',
       name: 'Netflix',
-      shares: 3,
+      shares: 30,
       exchange: 'NASDAQ',
     },
     {
@@ -452,7 +452,7 @@ export const calculateGainLoss = async (holding, currentPrice, type = 'stock') =
     'NVDA': 116.35,           // USD - Your actual cost
     'CRWV': 106.75,           // USD - Your actual cost
     'GOOGL': 160.31,          // USD - Your corrected actual cost
-    'NFLX': 335.09,           // USD - Your actual cost
+    'NFLX': 32.94,            // USD - Post-split cost basis
     'TTWO': 108.02,           // USD - Your actual cost
     'PYPL': 71.73,            // USD - Your actual cost
     'RXRX': 5.65,             // USD - Your actual cost
@@ -485,7 +485,7 @@ export const calculateGainLossPercentage = async (holding, currentPrice, type = 
     'NVDA': 116.35,           // USD - Your actual cost
     'CRWV': 106.75,           // USD - Your actual cost
     'GOOGL': 160.31,          // USD - Your corrected actual cost
-    'NFLX': 335.09,           // USD - Your actual cost
+    'NFLX': 32.94,            // USD - Post-split cost basis
     'TTWO': 108.02,           // USD - Your actual cost
     'PYPL': 71.73,            // USD - Your actual cost
     'RXRX': 5.65,             // USD - Your actual cost

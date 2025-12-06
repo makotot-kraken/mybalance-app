@@ -42,7 +42,7 @@ const portfolio = {
     {
       symbol: 'NFLX',
       name: 'Netflix',
-      shares: 3,
+      shares: 30,
       exchange: 'NASDAQ',
     },
     {
