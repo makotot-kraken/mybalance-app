@@ -13,6 +13,7 @@ import {
   stopKeepAlive,
   getLastUpdateTime
 } from './data/assets';
+import { calculateAnnualProfits } from './utils/annualProfit';
 
 // Import portfolio history
 import portfolioHistory from './data/portfolio-history.json';
@@ -203,6 +204,9 @@ export default function App() {
     }
   }, [prices]);
 
+  // Calculate annual profits
+  const annualProfits = calculateAnnualProfits(portfolioHistory);
+
   return (
     <>
       <StatusBar style="light" backgroundColor="#0E1111" />
@@ -305,6 +309,55 @@ export default function App() {
               </View>
             </View>
           )}
+          
+          {/* Annual Profit Section */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Annual Performance</Text>
+            {annualProfits.length === 0 ? (
+              <Text style={styles.cardValue}>No annual data yet</Text>
+            ) : (
+              annualProfits.map((item) => (
+                <View key={item.year} style={styles.annualProfitCard}>
+                  <Text style={styles.annualYear}>{item.year}</Text>
+                  <View style={styles.annualRow}>
+                    <Text style={styles.annualLabel}>Start Value:</Text>
+                    <Text style={styles.annualValue}>¥{item.startValue.toLocaleString('en-US', { maximumFractionDigits: 0 })}</Text>
+                  </View>
+                  <View style={styles.annualRow}>
+                    <Text style={styles.annualLabel}>End Value:</Text>
+                    <Text style={styles.annualValue}>¥{item.endValue.toLocaleString('en-US', { maximumFractionDigits: 0 })}</Text>
+                  </View>
+                  {item.capitalAdded !== 0 && (
+                    <View style={styles.annualRow}>
+                      <Text style={styles.annualLabel}>Capital Added:</Text>
+                      <Text style={[styles.annualValue, { color: item.capitalAdded > 0 ? '#2196F3' : '#FF9800' }]}>
+                        {item.capitalAdded > 0 ? '+' : ''}¥{item.capitalAdded.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                      </Text>
+                    </View>
+                  )}
+                  <View style={styles.annualRow}>
+                    <Text style={styles.annualLabel}>Actual Profit:</Text>
+                    <Text style={[styles.annualValue, { color: item.actualProfit >= 0 ? '#4CAF50' : '#F44336', fontWeight: 'bold' }]}>
+                      {item.actualProfit >= 0 ? '+' : ''}¥{item.actualProfit.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                    </Text>
+                  </View>
+                  <View style={styles.annualRow}>
+                    <Text style={[styles.annualLabel, { fontWeight: 'bold' }]}>Return:</Text>
+                    <Text style={[styles.annualValue, { 
+                      color: item.returnPercent >= 0 ? '#4CAF50' : '#F44336', 
+                      fontWeight: 'bold',
+                      fontSize: 18
+                    }]}>
+                      {item.returnPercent >= 0 ? '+' : ''}{item.returnPercent}%
+                    </Text>
+                  </View>
+                </View>
+              ))
+            )}
+            <Text style={styles.chartNote}>
+              Actual Profit = End Value - Start Value - Capital Added
+            </Text>
+          </View>
           
           {/* Portfolio Summary with Expandable Sections */}
           <View style={styles.section}>
@@ -604,5 +657,31 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: '#888',
     fontWeight: 'bold',
+  },
+  annualProfitCard: {
+    backgroundColor: '#1E1E1E',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  annualYear: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#FFC107',
+    marginBottom: 12,
+  },
+  annualRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  annualLabel: {
+    fontSize: 14,
+    color: '#888',
+  },
+  annualValue: {
+    fontSize: 14,
+    color: '#F5F5F5',
   },
 });
