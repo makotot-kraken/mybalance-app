@@ -8,19 +8,46 @@ export const capitalEvents = [
     type: 'initial',
     note: 'Initial portfolio snapshot - Nov 12, 2025'
   },
-  // Add new entries when you add money, for example:
-  // {
-  //   date: '2025-12-15',
-  //   amount: 500000,
-  //   type: 'deposit',
-  //   note: 'Added ¥500K for new investments'
-  // },
-  // {
-  //   date: '2026-01-10',
-  //   amount: -200000,
-  //   type: 'withdrawal',
-  //   note: 'Withdrew ¥200K for expenses'
-  // },
+  // TEST DATA - 2026
+  {
+    date: '2026-02-15',
+    amount: 1500000,
+    type: 'deposit',
+    note: '[TEST] Bonus investment'
+  },
+  {
+    date: '2026-07-20',
+    amount: 800000,
+    type: 'deposit',
+    note: '[TEST] Mid-year addition'
+  },
+  // TEST DATA - 2027
+  {
+    date: '2027-01-10',
+    amount: 1200000,
+    type: 'deposit',
+    note: '[TEST] New year investment'
+  },
+  {
+    date: '2027-09-05',
+    amount: -500000,
+    type: 'withdrawal',
+    note: '[TEST] Partial withdrawal'
+  },
+  // TEST DATA - 2028
+  {
+    date: '2028-03-15',
+    amount: 2000000,
+    type: 'deposit',
+    note: '[TEST] Large deposit'
+  },
+  // TEST DATA - 2029
+  {
+    date: '2029-05-20',
+    amount: 1000000,
+    type: 'deposit',
+    note: '[TEST] Regular contribution'
+  },
 ];
 
 // Calculate total capital invested up to a specific date
