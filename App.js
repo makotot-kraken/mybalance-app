@@ -319,37 +319,39 @@ export default function App() {
               annualProfits.map((item) => (
                 <View key={item.year} style={styles.annualProfitCard}>
                   <Text style={styles.annualYear}>{item.year}</Text>
-                  <View style={styles.annualRow}>
-                    <Text style={styles.annualLabel}>Start Value:</Text>
-                    <Text style={styles.annualValue}>¥{item.startValue.toLocaleString('en-US', { maximumFractionDigits: 0 })}</Text>
-                  </View>
-                  <View style={styles.annualRow}>
-                    <Text style={styles.annualLabel}>End Value:</Text>
-                    <Text style={styles.annualValue}>¥{item.endValue.toLocaleString('en-US', { maximumFractionDigits: 0 })}</Text>
-                  </View>
-                  {item.capitalAdded !== 0 && (
+                  <View style={styles.annualGrid}>
                     <View style={styles.annualRow}>
-                      <Text style={styles.annualLabel}>Capital Added:</Text>
-                      <Text style={[styles.annualValue, { color: item.capitalAdded > 0 ? '#2196F3' : '#FF9800' }]}>
-                        {item.capitalAdded > 0 ? '+' : ''}¥{item.capitalAdded.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                      <Text style={styles.annualLabel}>Start Value:</Text>
+                      <Text style={styles.annualValue}>¥{item.startValue.toLocaleString('en-US', { maximumFractionDigits: 0 })}</Text>
+                    </View>
+                    <View style={styles.annualRow}>
+                      <Text style={styles.annualLabel}>End Value:</Text>
+                      <Text style={styles.annualValue}>¥{item.endValue.toLocaleString('en-US', { maximumFractionDigits: 0 })}</Text>
+                    </View>
+                    {item.capitalAdded !== 0 && (
+                      <View style={styles.annualRow}>
+                        <Text style={styles.annualLabel}>Capital Added:</Text>
+                        <Text style={[styles.annualValue, { color: item.capitalAdded > 0 ? '#2196F3' : '#FF9800' }]}>
+                          {item.capitalAdded > 0 ? '+' : ''}¥{item.capitalAdded.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                        </Text>
+                      </View>
+                    )}
+                    <View style={styles.annualRow}>
+                      <Text style={styles.annualLabel}>Actual Profit:</Text>
+                      <Text style={[styles.annualValue, { color: item.actualProfit >= 0 ? '#4CAF50' : '#F44336', fontWeight: 'bold' }]}>
+                        {item.actualProfit >= 0 ? '+' : ''}¥{item.actualProfit.toLocaleString('en-US', { maximumFractionDigits: 0 })}
                       </Text>
                     </View>
-                  )}
-                  <View style={styles.annualRow}>
-                    <Text style={styles.annualLabel}>Actual Profit:</Text>
-                    <Text style={[styles.annualValue, { color: item.actualProfit >= 0 ? '#4CAF50' : '#F44336', fontWeight: 'bold' }]}>
-                      {item.actualProfit >= 0 ? '+' : ''}¥{item.actualProfit.toLocaleString('en-US', { maximumFractionDigits: 0 })}
-                    </Text>
-                  </View>
-                  <View style={styles.annualRow}>
-                    <Text style={[styles.annualLabel, { fontWeight: 'bold' }]}>Return:</Text>
-                    <Text style={[styles.annualValue, { 
-                      color: item.returnPercent >= 0 ? '#4CAF50' : '#F44336', 
-                      fontWeight: 'bold',
-                      fontSize: 18
-                    }]}>
-                      {item.returnPercent >= 0 ? '+' : ''}{item.returnPercent}%
-                    </Text>
+                    <View style={styles.annualRow}>
+                      <Text style={[styles.annualLabel, { fontWeight: 'bold' }]}>Return:</Text>
+                      <Text style={[styles.annualValue, { 
+                        color: item.returnPercent >= 0 ? '#4CAF50' : '#F44336', 
+                        fontWeight: 'bold',
+                        fontSize: 18
+                      }]}>
+                        {item.returnPercent >= 0 ? '+' : ''}{item.returnPercent}%
+                      </Text>
+                    </View>
                   </View>
                 </View>
               ))
@@ -663,6 +665,9 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
+    maxWidth: 600,
+    alignSelf: 'center',
+    width: '100%',
   },
   annualYear: {
     fontSize: 20,
@@ -670,18 +675,26 @@ const styles = StyleSheet.create({
     color: '#FFC107',
     marginBottom: 12,
   },
+  annualGrid: {
+    width: '100%',
+  },
   annualRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 8,
+    gap: 16,
   },
   annualLabel: {
     fontSize: 14,
     color: '#888',
+    flex: 0,
+    minWidth: 120,
   },
   annualValue: {
     fontSize: 14,
     color: '#F5F5F5',
+    flex: 1,
+    textAlign: 'right',
   },
 });
