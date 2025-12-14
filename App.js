@@ -544,12 +544,10 @@ export default function App() {
                         <Text style={styles.annualValue}>¥{item.startValue.toLocaleString('en-US', { maximumFractionDigits: 0 })}</Text>
                       </View>
                     )}
-                    {item.year !== '2025' && (
-                      <View style={styles.annualRow}>
-                        <Text style={styles.annualLabel}>End Value:</Text>
-                        <Text style={styles.annualValue}>¥{item.endValue.toLocaleString('en-US', { maximumFractionDigits: 0 })}</Text>
-                      </View>
-                    )}
+                    <View style={styles.annualRow}>
+                      <Text style={styles.annualLabel}>End Value:</Text>
+                      <Text style={styles.annualValue}>¥{item.endValue.toLocaleString('en-US', { maximumFractionDigits: 0 })}</Text>
+                    </View>
                     {item.capitalAdded !== 0 && (
                       <View style={styles.annualRow}>
                         <Text style={styles.annualLabel}>Capital Added:</Text>
