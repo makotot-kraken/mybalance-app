@@ -38,8 +38,12 @@ export function calculateAnnualProfits(history, currentHoldingsGain = null) {
     const isStartYear = i === 0;
     const isCurrentYear = year === currentYear;
     
-    if (isStartYear && isCurrentYear && currentHoldingsGain !== null) {
-      // For 2025 (current year), use the total gain/loss from all holdings
+    // For 2025, use current holdings gain ONLY if we're still in 2025
+    // Once 2025 ends, lock to the final snapshot value
+    const isStillIn2025 = isStartYear && isCurrentYear && currentHoldingsGain !== null;
+    
+    if (isStillIn2025) {
+      // For 2025 while still in 2025, use the total gain/loss from all holdings
       const actualProfit = currentHoldingsGain;
       const returnPercent = startValue > 0 ? (actualProfit / startValue) * 100 : 0;
       
