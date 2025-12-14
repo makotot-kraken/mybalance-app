@@ -702,7 +702,31 @@ export default function App() {
 
           {/* Trade History Section */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Trade History</Text>
+            <View style={styles.sectionHeaderRow}>
+              <Text style={styles.sectionTitle}>Trade History</Text>
+              {trades.length > 0 && (
+                <TouchableOpacity 
+                  style={styles.clearTradesButton}
+                  onPress={() => {
+                    Alert.alert(
+                      'Clear All Trades?',
+                      `This will delete all ${trades.length} logged trade(s).\n\nTo actually clear, you need to manually empty the trades array in:\ndata/trade-log.js\n\nThis is for testing purposes only.`,
+                      [
+                        { text: 'Cancel', style: 'cancel' },
+                        { 
+                          text: 'Show Instructions', 
+                          onPress: () => {
+                            console.log('\nTo clear trades:\n1. Open: data/trade-log.js\n2. Change: export const trades = [...]\n3. To: export const trades = []\n4. Rebuild and deploy\n');
+                          }
+                        }
+                      ]
+                    );
+                  }}
+                >
+                  <Text style={styles.clearTradesButtonText}>🗑️ Clear All</Text>
+                </TouchableOpacity>
+              )}
+            </View>
             {trades.length === 0 ? (
               <Text style={styles.chartNote}>No trades logged yet. Use the "Log Trade" button to record your trades.</Text>
             ) : (
@@ -806,6 +830,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#F5F5F5',
     marginBottom: 16,
+  },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  clearTradesButton: {
+    backgroundColor: '#F44336',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  clearTradesButtonText: {
+    color: '#FFF',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
   chartContainer: {
     backgroundColor: '#1A1A1A',
