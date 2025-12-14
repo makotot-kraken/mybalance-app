@@ -257,7 +257,12 @@ export default function App() {
       'Trade Logged',
       `${tradeForm.type === 'buy' ? 'Purchase' : 'Sale'} of ${shares} ${tradeForm.symbol.toUpperCase()} shares\n` +
       `Cost: $${totalCost.toFixed(2)} (¥${totalCostJPY.toLocaleString()})\n\n` +
-      `Please manually add this trade to:\ndata/trade-log.js`,
+      `NEXT STEPS:\n` +
+      `1. Add trade to: data/trade-log.js\n` +
+      `2. Update holdings in: data/assets.js\n` +
+      `3. Update cost basis (2 places in assets.js)\n` +
+      `4. Update snapshot script & price fetchers\n\n` +
+      `Trade JSON logged to console.`,
       [
         { text: 'OK', onPress: () => {
           setShowTradeModal(false);
@@ -535,7 +540,8 @@ export default function App() {
               ))
             )}
             <Text style={styles.chartNote}>
-              Actual Profit = End Value - Start Value - Capital Added
+              2025 (Start Year): Profit = End - Start{'\n'}
+              Future Years: Profit = End - Start - Capital Added
             </Text>
           </View>
           

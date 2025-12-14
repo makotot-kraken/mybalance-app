@@ -28,26 +28,44 @@ export function calculateAnnualProfits(history) {
     
     if (!startValue || !endValue) continue;
     
-    // Get capital added during this year
+    // Special handling for first year (2025)
     const isStartYear = i === 0;
-    const capitalAdded = getCapitalAddedInYear(year, isStartYear);
     
-    // Calculate actual profit (excluding capital additions)
-    const actualProfit = endValue - startValue - capitalAdded;
-    
-    // Calculate return % based on average capital deployed
-    // Average capital = start + (capital added / 2) - approximates time-weighted return
-    const avgCapital = startValue + (capitalAdded / 2);
-    const returnPercent = avgCapital > 0 ? (actualProfit / avgCapital) * 100 : 0;
-    
-    result.push({
-      year,
-      startValue,
-      endValue,
-      capitalAdded,
-      actualProfit,
-      returnPercent: parseFloat(returnPercent.toFixed(2))
-    });
+    if (isStartYear) {
+      // For the starting year, all profit is from market gains
+      // Initial capital is the starting portfolio value
+      const actualProfit = endValue - startValue;
+      const returnPercent = startValue > 0 ? (actualProfit / startValue) * 100 : 0;
+      
+      result.push({
+        year,
+        startValue,
+        endValue,
+        capitalAdded: 0,
+        actualProfit,
+        returnPercent: parseFloat(returnPercent.toFixed(2))
+      });
+    } else {
+      // For subsequent years, account for capital additions
+      const capitalAdded = getCapitalAddedInYear(year, false);
+      
+      // Calculate actual profit (excluding capital additions)
+      const actualProfit = endValue - startValue - capitalAdded;
+      
+      // Calculate return % based on average capital deployed
+      // Average capital = start + (capital added / 2) - approximates time-weighted return
+      const avgCapital = startValue + (capitalAdded / 2);
+      const returnPercent = avgCapital > 0 ? (actualProfit / avgCapital) * 100 : 0;
+      
+      result.push({
+        year,
+        startValue,
+        endValue,
+        capitalAdded,
+        actualProfit,
+        returnPercent: parseFloat(returnPercent.toFixed(2))
+      });
+    }
   }
   
   return result;
