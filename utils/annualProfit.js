@@ -23,8 +23,13 @@ export function calculateAnnualProfits(history) {
     
     if (entries.length === 0) continue;
     
-    const startValue = entries[0].totalValue;
-    const endValue = entries[entries.length - 1].totalValue;
+    // Filter out entries with null totalValue
+    const validEntries = entries.filter(entry => entry.totalValue !== null);
+    
+    if (validEntries.length === 0) continue;
+    
+    const startValue = validEntries[0].totalValue;
+    const endValue = validEntries[validEntries.length - 1].totalValue;
     
     if (!startValue || !endValue) continue;
     
