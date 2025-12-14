@@ -14,6 +14,7 @@ import {
   getLastUpdateTime
 } from './data/assets';
 import { calculateAnnualProfits } from './utils/annualProfit';
+import { trades } from './data/trade-log';
 
 // Import portfolio history
 import portfolioHistory from './data/portfolio-history.json';
@@ -696,6 +697,59 @@ export default function App() {
               </View>
             )}
           </View>
+
+          {/* Trade History Section */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Trade History</Text>
+            {trades.length === 0 ? (
+              <Text style={styles.chartNote}>No trades logged yet. Use the "Log Trade" button to record your trades.</Text>
+            ) : (
+              <View>
+                {trades.slice().reverse().map((trade, index) => (
+                  <View key={index} style={styles.tradeCard}>
+                    <View style={styles.tradeHeader}>
+                      <View style={styles.tradeSymbolRow}>
+                        <Text style={styles.tradeSymbol}>{trade.symbol}</Text>
+                        <View style={[styles.tradeBadge, { backgroundColor: trade.type === 'buy' ? '#4CAF50' : '#F44336' }]}>
+                          <Text style={styles.tradeBadgeText}>{trade.type.toUpperCase()}</Text>
+                        </View>
+                      </View>
+                      <Text style={styles.tradeDate}>{trade.date}</Text>
+                    </View>
+                    <View style={styles.tradeDetails}>
+                      <View style={styles.tradeRow}>
+                        <Text style={styles.tradeLabel}>Shares:</Text>
+                        <Text style={styles.tradeValue}>{trade.shares}</Text>
+                      </View>
+                      <View style={styles.tradeRow}>
+                        <Text style={styles.tradeLabel}>Price/Share:</Text>
+                        <Text style={styles.tradeValue}>${trade.pricePerShare.toFixed(2)}</Text>
+                      </View>
+                      <View style={styles.tradeRow}>
+                        <Text style={styles.tradeLabel}>Total (USD):</Text>
+                        <Text style={styles.tradeValue}>${trade.totalCost.toFixed(2)}</Text>
+                      </View>
+                      <View style={styles.tradeRow}>
+                        <Text style={styles.tradeLabel}>Total (JPY):</Text>
+                        <Text style={[styles.tradeValue, { fontWeight: 'bold' }]}>
+                          ¥{trade.totalCostJPY.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                        </Text>
+                      </View>
+                      <View style={styles.tradeRow}>
+                        <Text style={styles.tradeLabel}>Exchange Rate:</Text>
+                        <Text style={styles.tradeValue}>¥{trade.exchangeRate.toFixed(2)}</Text>
+                      </View>
+                      {trade.note && (
+                        <View style={styles.tradeNoteRow}>
+                          <Text style={styles.tradeNote}>{trade.note}</Text>
+                        </View>
+                      )}
+                    </View>
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
         </View>
       </ScrollView>
     </>
@@ -1018,5 +1072,73 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  tradeCard: {
+    backgroundColor: '#1E1E1E',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: '#FFC107',
+  },
+  tradeHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+  },
+  tradeSymbolRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  tradeSymbol: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFC107',
+  },
+  tradeBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+  },
+  tradeBadgeText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: '#FFF',
+  },
+  tradeDate: {
+    fontSize: 14,
+    color: '#888',
+  },
+  tradeDetails: {
+    gap: 8,
+  },
+  tradeRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  tradeLabel: {
+    fontSize: 14,
+    color: '#888',
+  },
+  tradeValue: {
+    fontSize: 14,
+    color: '#F5F5F5',
+  },
+  tradeNoteRow: {
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#333',
+  },
+  tradeNote: {
+    fontSize: 13,
+    color: '#AAA',
+    fontStyle: 'italic',
   },
 });
