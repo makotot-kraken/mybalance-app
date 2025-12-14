@@ -252,68 +252,35 @@ export default function App() {
       note: tradeForm.note || `${tradeForm.type === 'buy' ? 'Bought' : 'Sold'} ${shares} shares of ${tradeForm.symbol.toUpperCase()}`
     };
     
-    // Save trade to backend
-    try {
-      const response = await fetch('/api/process-trade', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newTrade)
-      });
-      
-      if (response.ok) {
-        Alert.alert(
-          'Trade Processed Successfully! ✅',
-          `${tradeForm.type === 'buy' ? 'Purchase' : 'Sale'} of ${shares} ${tradeForm.symbol.toUpperCase()} shares\n` +
-          `Cost: $${totalCost.toFixed(2)} (¥${totalCostJPY.toLocaleString()})\n\n` +
-          `Updated:\n` +
-          `✓ Portfolio holdings\n` +
-          `✓ Cost basis\n` +
-          `✓ Price fetchers\n` +
-          `✓ Snapshot script\n` +
-          `✓ Capital tracking\n\n` +
-          `Please rebuild and deploy:\n` +
-          `npx expo export -p web --output-dir docs && git push`,
-          [
-            { text: 'OK', onPress: () => {
-              setShowTradeModal(false);
-              setTradeForm({
-                date: new Date().toISOString().split('T')[0],
-                type: 'buy',
-                symbol: '',
-                shares: '',
-                pricePerShare: '',
-                note: ''
-              });
-            }}
-          ]
-        );
-      } else {
-        throw new Error('Server error');
-      }
-    } catch (error) {
-      // Fallback: show manual instructions
-      Alert.alert(
-        'Trade Logged (Manual Mode)',
-        `${tradeForm.type === 'buy' ? 'Purchase' : 'Sale'} of ${shares} ${tradeForm.symbol.toUpperCase()} shares\n` +
-        `Cost: $${totalCost.toFixed(2)} (¥${totalCostJPY.toLocaleString()})\n\n` +
-        `Run this command to process:\n` +
-        `node scripts/process-trade.js '${JSON.stringify(newTrade)}'`,
-        [
-          { text: 'OK', onPress: () => {
-            setShowTradeModal(false);
-            setTradeForm({
-              date: new Date().toISOString().split('T')[0],
-              type: 'buy',
-              symbol: '',
-              shares: '',
-              pricePerShare: '',
-              note: ''
-            });
-          }}
-        ]
-      );
-      console.log('Trade to process:', JSON.stringify(newTrade, null, 2));
-    }
+    // Show command to run
+    const command = `npm run trade -- ${tradeForm.type} ${tradeForm.symbol.toUpperCase()} ${shares} ${pricePerShare}${tradeForm.note ? ` "${tradeForm.note}"` : ''}`;
+    
+    console.log('\n=== TRADE TO PROCESS ===');
+    console.log('Command:', command);
+    console.log('Trade:', JSON.stringify(newTrade, null, 2));
+    console.log('========================\n');
+    
+    Alert.alert(
+      'Trade Ready to Process',
+      `${tradeForm.type === 'buy' ? 'Purchase' : 'Sale'} of ${shares} ${tradeForm.symbol.toUpperCase()} shares\n` +
+      `Price: $${pricePerShare.toFixed(2)}\n` +
+      `Total: $${totalCost.toFixed(2)} (¥${totalCostJPY.toLocaleString()})\n\n` +
+      `Run this command:\n${command}\n\n` +
+      `Then rebuild and deploy.`,
+      [
+        { text: 'OK', onPress: () => {
+          setShowTradeModal(false);
+          setTradeForm({
+            date: new Date().toISOString().split('T')[0],
+            type: 'buy',
+            symbol: '',
+            shares: '',
+            pricePerShare: '',
+            note: ''
+          });
+        }}
+      ]
+    );
   };
 
   return (
