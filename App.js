@@ -213,8 +213,9 @@ export default function App() {
     }
   }, [prices]);
 
-  // Calculate annual profits
-  const annualProfits = calculateAnnualProfits(portfolioHistory);
+  // Calculate annual profits - for 2025, use current holdings gains
+  const totalHoldingsGain = (stockTotalGainLoss || 0) + (cryptoTotalGainLoss || 0);
+  const annualProfits = calculateAnnualProfits(portfolioHistory, totalHoldingsGain);
 
   const handleLogTrade = async () => {
     // Validate form

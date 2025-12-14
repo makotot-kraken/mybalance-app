@@ -4,7 +4,7 @@
 
 import { getCapitalAddedInYear } from '../data/capital-tracking';
 
-export function calculateAnnualProfits(history) {
+export function calculateAnnualProfits(history, currentHoldingsGain = null) {
   // Group entries by year
   const years = {};
   for (const entry of history) {
@@ -16,6 +16,7 @@ export function calculateAnnualProfits(history) {
   // Calculate profit for each year accounting for capital additions
   const result = [];
   const sortedYears = Object.keys(years).sort();
+  const currentYear = new Date().getFullYear().toString();
   
   for (let i = 0; i < sortedYears.length; i++) {
     const year = sortedYears[i];
@@ -33,10 +34,24 @@ export function calculateAnnualProfits(history) {
     
     if (!startValue || !endValue) continue;
     
-    // Special handling for first year (2025)
+    // Special handling for first year (2025) and current year
     const isStartYear = i === 0;
+    const isCurrentYear = year === currentYear;
     
-    if (isStartYear) {
+    if (isStartYear && isCurrentYear && currentHoldingsGain !== null) {
+      // For 2025 (current year), use the total gain/loss from all holdings
+      const actualProfit = currentHoldingsGain;
+      const returnPercent = startValue > 0 ? (actualProfit / startValue) * 100 : 0;
+      
+      result.push({
+        year,
+        startValue,
+        endValue,
+        capitalAdded: 0,
+        actualProfit,
+        returnPercent: parseFloat(returnPercent.toFixed(2))
+      });
+    } else if (isStartYear) {
       // For the starting year, all profit is from market gains
       // Initial capital is the starting portfolio value
       const actualProfit = endValue - startValue;
