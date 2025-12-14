@@ -705,43 +705,58 @@ export default function App() {
             <View style={styles.sectionHeaderRow}>
               <Text style={styles.sectionTitle}>Trade History</Text>
               {trades.length > 0 && (
-                <TouchableOpacity 
-                  style={styles.clearTradesButton}
-                  onPress={() => {
-                    Alert.alert(
-                      'Clear All Trades?',
-                      `This will delete all ${trades.length} logged trade(s).\n\nTo actually clear, you need to manually empty the trades array in:\ndata/trade-log.js\n\nThis is for testing purposes only.`,
-                      [
-                        { text: 'Cancel', style: 'cancel' },
-                        { 
-                          text: 'Show Instructions', 
-                          onPress: () => {
-                            console.log('\nTo clear trades:\n1. Open: data/trade-log.js\n2. Change: export const trades = [...]\n3. To: export const trades = []\n4. Rebuild and deploy\n');
-                          }
-                        }
-                      ]
-                    );
-                  }}
-                >
-                  <Text style={styles.clearTradesButtonText}>🗑️ Clear All</Text>
-                </TouchableOpacity>
+                <Text style={styles.tradeCount}>{trades.length} trade{trades.length !== 1 ? 's' : ''}</Text>
               )}
             </View>
             {trades.length === 0 ? (
               <Text style={styles.chartNote}>No trades logged yet. Use the "Log Trade" button to record your trades.</Text>
             ) : (
               <View>
-                {trades.slice().reverse().map((trade, index) => (
-                  <View key={index} style={styles.tradeCard}>
-                    <View style={styles.tradeHeader}>
-                      <View style={styles.tradeSymbolRow}>
-                        <Text style={styles.tradeSymbol}>{trade.symbol}</Text>
-                        <View style={[styles.tradeBadge, { backgroundColor: trade.type === 'buy' ? '#4CAF50' : '#F44336' }]}>
-                          <Text style={styles.tradeBadgeText}>{trade.type.toUpperCase()}</Text>
+                {trades.slice().reverse().map((trade, index) => {
+                  const actualIndex = trades.length - 1 - index; // Get the actual index in the original array
+                  return (
+                    <View key={index} style={styles.tradeCard}>
+                      <View style={styles.tradeHeader}>
+                        <View style={styles.tradeSymbolRow}>
+                          <Text style={styles.tradeSymbol}>{trade.symbol}</Text>
+                          <View style={[styles.tradeBadge, { backgroundColor: trade.type === 'buy' ? '#4CAF50' : '#F44336' }]}>
+                            <Text style={styles.tradeBadgeText}>{trade.type.toUpperCase()}</Text>
+                          </View>
+                        </View>
+                        <View style={styles.tradeHeaderRight}>
+                          <Text style={styles.tradeDate}>{trade.date}</Text>
+                          <TouchableOpacity 
+                            style={styles.deleteTradeButton}
+                            onPress={() => {
+                              Alert.alert(
+                                'Delete Trade?',
+                                `Remove ${trade.type} ${trade.shares} ${trade.symbol} @ $${trade.pricePerShare.toFixed(2)}?\n\n` +
+                                `To delete this trade:\n` +
+                                `1. Open: data/trade-log.js\n` +
+                                `2. Find and remove the trade at index ${actualIndex}\n` +
+                                `   (${trade.symbol} on ${trade.date})\n` +
+                                `3. Rebuild and deploy\n\n` +
+                                `Trade details logged to console.`,
+                                [
+                                  { text: 'Cancel', style: 'cancel' },
+                                  { 
+                                    text: 'Show Details', 
+                                    onPress: () => {
+                                      console.log('\n=== DELETE THIS TRADE ===');
+                                      console.log('Index in array:', actualIndex);
+                                      console.log('Trade:', JSON.stringify(trade, null, 2));
+                                      console.log('\nFile: data/trade-log.js');
+                                      console.log(`Look for: ${trade.symbol} on ${trade.date}\n`);
+                                    }
+                                  }
+                                ]
+                              );
+                            }}
+                          >
+                            <Text style={styles.deleteTradeButtonText}>🗑️</Text>
+                          </TouchableOpacity>
                         </View>
                       </View>
-                      <Text style={styles.tradeDate}>{trade.date}</Text>
-                    </View>
                     <View style={styles.tradeDetails}>
                       <View style={styles.tradeRow}>
                         <Text style={styles.tradeLabel}>Shares:</Text>
@@ -772,7 +787,8 @@ export default function App() {
                       )}
                     </View>
                   </View>
-                ))}
+                  );
+                })}
               </View>
             )}
           </View>
@@ -837,15 +853,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
-  clearTradesButton: {
-    backgroundColor: '#F44336',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  clearTradesButtonText: {
-    color: '#FFF',
+  tradeCount: {
     fontSize: 14,
+    color: '#888',
     fontWeight: 'bold',
   },
   chartContainer: {
@@ -1137,6 +1147,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+  },
+  tradeHeaderRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  deleteTradeButton: {
+    backgroundColor: '#F44336',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  deleteTradeButtonText: {
+    fontSize: 16,
   },
   tradeSymbol: {
     fontSize: 18,
