@@ -10,7 +10,7 @@ const portfolio = {
     {
       symbol: 'BTCUSDT',
       name: 'Bitcoin',
-      amount: 0.03639155,
+      amount: 0.05060055,
       exchange: 'BINANCE',
     },
   ],

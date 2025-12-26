@@ -6,7 +6,7 @@ export const portfolio = {
     {
       symbol: 'BTCUSDT',
       name: 'Bitcoin',
-      amount: 0.03639155,
+      amount: 0.05060055,
       exchange: 'BINANCE',
     },
   ],
@@ -447,7 +447,7 @@ export const calculateGainLoss = async (holding, currentPrice, type = 'stock') =
   
   // Your actual average purchase costs (in original currency)
   const actualAvgCostsOriginal = {
-    'BTCUSDT': 16487344,      // JPY - ¥600,000 total / 0.03639155 BTC = ¥16,487,344 per BTC
+    'BTCUSDT': 15809978,      // JPY - ¥800,000 total / 0.05060055 BTC = ¥15,809,978 per BTC
     'TSLA': 289.82,           // USD - (288.48*48+298.7*7.2131)/55.2131
     'NVDA': 116.35,           // USD - Your actual cost
     'CRWV': 106.75,           // USD - Your actual cost
@@ -480,7 +480,7 @@ export const calculateGainLossPercentage = async (holding, currentPrice, type = 
   
   // Use the same actual average costs (in original currency)
   const actualAvgCostsOriginal = {
-    'BTCUSDT': 16487344,      // JPY - ¥600,000 total / 0.03639155 BTC = ¥16,487,344 per BTC
+    'BTCUSDT': 15809978,      // JPY - ¥800,000 total / 0.05060055 BTC = ¥15,809,978 per BTC
     'TSLA': 289.82,           // USD - (288.48*48+298.7*7.2131)/55.2131
     'NVDA': 116.35,           // USD - Your actual cost
     'CRWV': 106.75,           // USD - Your actual cost
