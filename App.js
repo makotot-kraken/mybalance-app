@@ -218,10 +218,10 @@ export default function App() {
   const totalHoldingsGain = (stockTotalGainLoss || 0) + (cryptoTotalGainLoss || 0);
   const annualProfits = calculateAnnualProfits(portfolioHistory, totalHoldingsGain);
 
-  const handleLogTrade = async () => {
+  const handleLogTrade = () => {
     // Validate form
     if (!tradeForm.symbol || !tradeForm.shares || !tradeForm.pricePerShare) {
-      Alert.alert('Error', 'Please fill in all required fields');
+      alert('Error: Please fill in all required fields');
       return;
     }
     
@@ -229,7 +229,7 @@ export default function App() {
     const pricePerShare = parseFloat(tradeForm.pricePerShare);
     
     if (isNaN(shares) || isNaN(pricePerShare)) {
-      Alert.alert('Error', 'Shares and price must be valid numbers');
+      alert('Error: Shares and price must be valid numbers');
       return;
     }
     
@@ -260,27 +260,23 @@ export default function App() {
     console.log('Trade:', JSON.stringify(newTrade, null, 2));
     console.log('========================\n');
     
-    Alert.alert(
-      'Trade Ready to Process',
-      `${tradeForm.type === 'buy' ? 'Purchase' : 'Sale'} of ${shares} ${tradeForm.symbol.toUpperCase()} shares\n` +
+    const message = `${tradeForm.type === 'buy' ? 'Purchase' : 'Sale'} of ${shares} ${tradeForm.symbol.toUpperCase()} shares\n\n` +
       `Price: $${pricePerShare.toFixed(2)}\n` +
       `Total: $${totalCost.toFixed(2)} (¥${totalCostJPY.toLocaleString()})\n\n` +
       `Run this command:\n${command}\n\n` +
-      `Then rebuild and deploy.`,
-      [
-        { text: 'OK', onPress: () => {
-          setShowTradeModal(false);
-          setTradeForm({
-            date: new Date().toISOString().split('T')[0],
-            type: 'buy',
-            symbol: '',
-            shares: '',
-            pricePerShare: '',
-            note: ''
-          });
-        }}
-      ]
-    );
+      `Then rebuild and deploy.`;
+    
+    if (confirm('Trade Ready to Process\n\n' + message)) {
+      setShowTradeModal(false);
+      setTradeForm({
+        date: new Date().toISOString().split('T')[0],
+        type: 'buy',
+        symbol: '',
+        shares: '',
+        pricePerShare: '',
+        note: ''
+      });
+    }
   };
 
   return (
