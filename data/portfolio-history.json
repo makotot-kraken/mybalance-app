@@ -219,104 +219,104 @@
     "date": "2025-12-14",
     "timestamp": "2025-12-14T21:17:25.068Z",
     "stockValue": 8999373,
-    "cryptoValue": null,
-    "totalValue": null,
+    "cryptoValue": 588611,
+    "totalValue": 9587984,
     "exchangeRate": 155.82964
   },
   {
     "date": "2025-12-15",
     "timestamp": "2025-12-15T21:19:27.060Z",
     "stockValue": 8393553,
-    "cryptoValue": null,
-    "totalValue": null,
+    "cryptoValue": 588611,
+    "totalValue": 8982164,
     "exchangeRate": 155.20873
   },
   {
     "date": "2025-12-16",
     "timestamp": "2025-12-16T21:20:08.963Z",
     "stockValue": 8490692,
-    "cryptoValue": null,
-    "totalValue": null,
+    "cryptoValue": 588611,
+    "totalValue": 9079303,
     "exchangeRate": 154.75473
   },
   {
     "date": "2025-12-17",
     "timestamp": "2025-12-17T21:19:53.116Z",
     "stockValue": 8224250,
-    "cryptoValue": null,
-    "totalValue": null,
+    "cryptoValue": 588611,
+    "totalValue": 8812861,
     "exchangeRate": 155.71788
   },
   {
     "date": "2025-12-18",
     "timestamp": "2025-12-18T21:17:41.830Z",
     "stockValue": 8462566,
-    "cryptoValue": null,
-    "totalValue": null,
+    "cryptoValue": 588611,
+    "totalValue": 9051177,
     "exchangeRate": 155.59038
   },
   {
     "date": "2025-12-19",
     "timestamp": "2025-12-19T21:18:36.860Z",
     "stockValue": 8824546,
-    "cryptoValue": null,
-    "totalValue": null,
+    "cryptoValue": 588611,
+    "totalValue": 9413157,
     "exchangeRate": 157.68935
   },
   {
     "date": "2025-12-20",
     "timestamp": "2025-12-20T21:16:27.187Z",
     "stockValue": 8826445,
-    "cryptoValue": null,
-    "totalValue": null,
+    "cryptoValue": 588611,
+    "totalValue": 9415056,
     "exchangeRate": 157.72328
   },
   {
     "date": "2025-12-21",
     "timestamp": "2025-12-21T21:17:50.935Z",
     "stockValue": 8826445,
-    "cryptoValue": null,
-    "totalValue": null,
+    "cryptoValue": 588611,
+    "totalValue": 9415056,
     "exchangeRate": 157.72328
   },
   {
     "date": "2025-12-22",
     "timestamp": "2025-12-22T21:18:09.348Z",
     "stockValue": 8953738,
-    "cryptoValue": null,
-    "totalValue": null,
+    "cryptoValue": 588611,
+    "totalValue": 9542349,
     "exchangeRate": 157.00311
   },
   {
     "date": "2025-12-23",
     "timestamp": "2025-12-23T21:19:06.673Z",
     "stockValue": 8910739,
-    "cryptoValue": null,
-    "totalValue": null,
+    "cryptoValue": 588611,
+    "totalValue": 9499350,
     "exchangeRate": 156.28628
   },
   {
     "date": "2025-12-24",
     "timestamp": "2025-12-24T21:18:24.071Z",
     "stockValue": 8887079,
-    "cryptoValue": null,
-    "totalValue": null,
+    "cryptoValue": 588611,
+    "totalValue": 9475690,
     "exchangeRate": 156.03377
   },
   {
     "date": "2025-12-25",
     "timestamp": "2025-12-25T21:18:26.773Z",
     "stockValue": 8864351,
-    "cryptoValue": null,
-    "totalValue": null,
+    "cryptoValue": 588611,
+    "totalValue": 9452962,
     "exchangeRate": 155.63471
   },
   {
     "date": "2025-12-26",
     "timestamp": "2025-12-26T21:18:02.739Z",
     "stockValue": 8776979,
-    "cryptoValue": null,
-    "totalValue": null,
+    "cryptoValue": 588611,
+    "totalValue": 9365590,
     "exchangeRate": 156.53405
   }
 ]

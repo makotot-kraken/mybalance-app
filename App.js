@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity, Dimensions, Modal, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity, Dimensions } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { 
   portfolio, 
@@ -90,15 +90,6 @@ export default function App() {
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const [stocksExpanded, setStocksExpanded] = useState(false);
   const [cryptoExpanded, setCryptoExpanded] = useState(false);
-  const [showTradeModal, setShowTradeModal] = useState(false);
-  const [tradeForm, setTradeForm] = useState({
-    date: new Date().toISOString().split('T')[0],
-    type: 'buy',
-    symbol: '',
-    shares: '',
-    pricePerShare: '',
-    note: ''
-  });
   
   const loadPrices = async () => {
     try {
@@ -218,67 +209,6 @@ export default function App() {
   const totalHoldingsGain = (stockTotalGainLoss || 0) + (cryptoTotalGainLoss || 0);
   const annualProfits = calculateAnnualProfits(portfolioHistory, totalHoldingsGain);
 
-  const handleLogTrade = () => {
-    // Validate form
-    if (!tradeForm.symbol || !tradeForm.shares || !tradeForm.pricePerShare) {
-      alert('Error: Please fill in all required fields');
-      return;
-    }
-    
-    const shares = parseFloat(tradeForm.shares);
-    const pricePerShare = parseFloat(tradeForm.pricePerShare);
-    
-    if (isNaN(shares) || isNaN(pricePerShare)) {
-      alert('Error: Shares and price must be valid numbers');
-      return;
-    }
-    
-    // Get current exchange rate (use latest from history or default)
-    const exchangeRate = portfolioHistory[portfolioHistory.length - 1]?.exchangeRate || 155;
-    
-    const totalCost = shares * pricePerShare;
-    const totalCostJPY = Math.round(totalCost * exchangeRate);
-    
-    const newTrade = {
-      date: tradeForm.date,
-      type: tradeForm.type,
-      symbol: tradeForm.symbol.toUpperCase(),
-      shares: shares,
-      pricePerShare: pricePerShare,
-      totalCost: totalCost,
-      exchangeRate: exchangeRate,
-      totalCostJPY: totalCostJPY,
-      capitalChange: tradeForm.type === 'buy' ? totalCostJPY : -totalCostJPY,
-      note: tradeForm.note || `${tradeForm.type === 'buy' ? 'Bought' : 'Sold'} ${shares} shares of ${tradeForm.symbol.toUpperCase()}`
-    };
-    
-    // Show command to run
-    const command = `npm run trade -- ${tradeForm.type} ${tradeForm.symbol.toUpperCase()} ${shares} ${pricePerShare}${tradeForm.note ? ` "${tradeForm.note}"` : ''}`;
-    
-    console.log('\n=== TRADE TO PROCESS ===');
-    console.log('Command:', command);
-    console.log('Trade:', JSON.stringify(newTrade, null, 2));
-    console.log('========================\n');
-    
-    const message = `${tradeForm.type === 'buy' ? 'Purchase' : 'Sale'} of ${shares} ${tradeForm.symbol.toUpperCase()} shares\n\n` +
-      `Price: $${pricePerShare.toFixed(2)}\n` +
-      `Total: $${totalCost.toFixed(2)} (¥${totalCostJPY.toLocaleString()})\n\n` +
-      `Run this command:\n${command}\n\n` +
-      `Then rebuild and deploy.`;
-    
-    if (confirm('Trade Ready to Process\n\n' + message)) {
-      setShowTradeModal(false);
-      setTradeForm({
-        date: new Date().toISOString().split('T')[0],
-        type: 'buy',
-        symbol: '',
-        shares: '',
-        pricePerShare: '',
-        note: ''
-      });
-    }
-  };
-
   return (
     <>
       <StatusBar style="light" backgroundColor="#0E1111" />
@@ -289,21 +219,11 @@ export default function App() {
         }
       >
         <View style={styles.content}>
-          <View style={styles.headerRow}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.greeting}>Welcome to MyBalance</Text>
-              <Text style={styles.subtitle}>Total Portfolio Value</Text>
-              <Text style={styles.totalValue}>
-                ¥{totalValue > 0 ? totalValue.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '0'}
-              </Text>
-            </View>
-            <TouchableOpacity 
-              style={styles.logTradeButton}
-              onPress={() => setShowTradeModal(true)}
-            >
-              <Text style={styles.logTradeButtonText}>📝 Log Trade</Text>
-            </TouchableOpacity>
-          </View>
+          <Text style={styles.greeting}>Welcome to MyBalance</Text>
+          <Text style={styles.subtitle}>Total Portfolio Value</Text>
+          <Text style={styles.totalValue}>
+            ¥{totalValue > 0 ? totalValue.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '0'}
+          </Text>
           <Text style={styles.lastUpdate}>
             Last updated: {lastUpdate.toLocaleDateString()} {lastUpdate.toLocaleTimeString()}
           </Text>
@@ -313,103 +233,6 @@ export default function App() {
             </Text>
           )}
         </View>
-
-        {/* Trade Modal */}
-        <Modal
-          visible={showTradeModal}
-          transparent={true}
-          animationType="slide"
-          onRequestClose={() => setShowTradeModal(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Log Trade</Text>
-              
-              <Text style={styles.inputLabel}>Date</Text>
-              <TextInput
-                style={styles.input}
-                value={tradeForm.date}
-                onChangeText={(text) => setTradeForm({...tradeForm, date: text})}
-                placeholder="YYYY-MM-DD"
-                placeholderTextColor="#666"
-              />
-              
-              <Text style={styles.inputLabel}>Type</Text>
-              <View style={styles.typeToggle}>
-                <TouchableOpacity 
-                  style={[styles.typeButton, tradeForm.type === 'buy' && styles.typeButtonActive]}
-                  onPress={() => setTradeForm({...tradeForm, type: 'buy'})}
-                >
-                  <Text style={[styles.typeButtonText, tradeForm.type === 'buy' && styles.typeButtonTextActive]}>
-                    Buy
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={[styles.typeButton, tradeForm.type === 'sell' && styles.typeButtonActive]}
-                  onPress={() => setTradeForm({...tradeForm, type: 'sell'})}
-                >
-                  <Text style={[styles.typeButtonText, tradeForm.type === 'sell' && styles.typeButtonTextActive]}>
-                    Sell
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              
-              <Text style={styles.inputLabel}>Symbol</Text>
-              <TextInput
-                style={styles.input}
-                value={tradeForm.symbol}
-                onChangeText={(text) => setTradeForm({...tradeForm, symbol: text})}
-                placeholder="e.g., TSLA, NVDA"
-                placeholderTextColor="#666"
-                autoCapitalize="characters"
-              />
-              
-              <Text style={styles.inputLabel}>Shares</Text>
-              <TextInput
-                style={styles.input}
-                value={tradeForm.shares}
-                onChangeText={(text) => setTradeForm({...tradeForm, shares: text})}
-                placeholder="Number of shares"
-                placeholderTextColor="#666"
-                keyboardType="decimal-pad"
-              />
-              
-              <Text style={styles.inputLabel}>Price per Share (USD)</Text>
-              <TextInput
-                style={styles.input}
-                value={tradeForm.pricePerShare}
-                onChangeText={(text) => setTradeForm({...tradeForm, pricePerShare: text})}
-                placeholder="Price in USD"
-                placeholderTextColor="#666"
-                keyboardType="decimal-pad"
-              />
-              
-              <Text style={styles.inputLabel}>Note (optional)</Text>
-              <TextInput
-                style={styles.input}
-                value={tradeForm.note}
-                onChangeText={(text) => setTradeForm({...tradeForm, note: text})}
-                placeholder="Additional notes"
-                placeholderTextColor="#666"
-              />
-              
-              <View style={styles.modalButtons}>
-                <TouchableOpacity 
-                  style={[styles.modalButton, styles.cancelButton]}
-                  onPress={() => setShowTradeModal(false)}
-                >
-                  <Text style={styles.cancelButtonText}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={[styles.modalButton, styles.submitButton]}
-                  onPress={handleLogTrade}
-                >
-                  <Text style={styles.submitButtonText}>Log Trade</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
 
         <View style={styles.content}>
           {/* Historical Portfolio Chart */}
