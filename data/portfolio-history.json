@@ -358,5 +358,13 @@
     "cryptoValue": null,
     "totalValue": null,
     "exchangeRate": 156.60804
+  },
+  {
+    "date": "2026-01-01",
+    "timestamp": "2026-01-01T21:19:24.511Z",
+    "stockValue": 8476347,
+    "cryptoValue": null,
+    "totalValue": null,
+    "exchangeRate": 156.75207
   }
 ]
