@@ -8,7 +8,9 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "trade": "node trade-cli.js",
-    "clear-trades": "node scripts/clear-trades.js"
+    "clear-trades": "node scripts/clear-trades.js",
+    "finalize-year": "node scripts/finalize-year.js",
+    "create-year": "node scripts/create-new-year.js"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",

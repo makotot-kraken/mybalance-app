@@ -1,8 +1,9 @@
 // utils/annualProfit.js
 // Calculate annual profit percentages from portfolio history
-// Accounts for capital additions/withdrawals
+// Uses annual-performance-db.js for accurate yearly calculations
 
 import { getCapitalAddedInYear } from '../data/capital-tracking';
+import { annualPerformanceData } from '../data/annual-performance-db';
 
 export function calculateAnnualProfits(history, currentHoldingsGain = null, currentBalance = null) {
   // Group entries by year
@@ -13,7 +14,7 @@ export function calculateAnnualProfits(history, currentHoldingsGain = null, curr
     years[year].push(entry);
   }
   
-  // Calculate profit for each year accounting for capital additions
+  // Calculate profit for each year
   const result = [];
   const sortedYears = Object.keys(years).sort();
   
@@ -23,52 +24,61 @@ export function calculateAnnualProfits(history, currentHoldingsGain = null, curr
     
     if (entries.length === 0) continue;
     
-    // Filter out entries with null totalValue
-    const validEntries = entries.filter(entry => entry.totalValue !== null);
+    // Check if year exists in database
+    const dbData = annualPerformanceData[year];
     
-    if (validEntries.length === 0) continue;
-    
-    const startValue = validEntries[0].totalValue;
-    const endValue = validEntries[validEntries.length - 1].totalValue;
-    
-    if (!startValue || !endValue) continue;
-    
-    // Hardcoded values for 2025
-    if (year === '2025') {
-      const endValue2025 = currentBalance || endValue; // Use current balance as end value
-      const actualProfit2025 = currentHoldingsGain || 0; // Use total holdings gain as actual profit
-      const returnPercent2025 = endValue2025 > 0 ? (actualProfit2025 / endValue2025) * 100 : 0;
+    if (dbData) {
+      // Use database values for this year
+      const endValue = year === '2025' && currentBalance ? currentBalance : (dbData.endValue || entries.filter(e => e.totalValue !== null).slice(-1)[0]?.totalValue);
+      const actualProfit = year === '2025' && currentHoldingsGain !== null ? currentHoldingsGain : dbData.actualProfit;
+      
+      let returnPercent = 0;
+      if (dbData.calculationMethod === 'hardcoded' && year === '2025') {
+        // For 2025: return = profit / end value
+        returnPercent = endValue > 0 ? (actualProfit / endValue) * 100 : 0;
+      } else if (actualProfit !== null) {
+        // For other years: use database value or calculate
+        if (dbData.returnPercent !== null) {
+          returnPercent = dbData.returnPercent;
+        } else {
+          const avgCapital = dbData.startValue + (dbData.netCapitalChange / 2);
+          returnPercent = avgCapital > 0 ? (actualProfit / avgCapital) * 100 : 0;
+        }
+      }
+      
+      result.push({
+        year,
+        startValue: dbData.startValue,
+        endValue: endValue,
+        capitalAdded: dbData.capitalAdded,
+        actualProfit: actualProfit,
+        returnPercent: parseFloat(returnPercent.toFixed(2))
+      });
+      
+    } else {
+      // Fallback: calculate from history if not in database
+      const validEntries = entries.filter(entry => entry.totalValue !== null);
+      if (validEntries.length === 0) continue;
+      
+      const startValue = validEntries[0].totalValue;
+      const endValue = validEntries[validEntries.length - 1].totalValue;
+      
+      if (!startValue || !endValue) continue;
+      
+      const capitalAdded = getCapitalAddedInYear(year, false);
+      const actualProfit = endValue - startValue - capitalAdded;
+      const avgCapital = startValue + (capitalAdded / 2);
+      const returnPercent = avgCapital > 0 ? (actualProfit / avgCapital) * 100 : 0;
       
       result.push({
         year,
         startValue,
-        endValue: endValue2025,
-        capitalAdded: 0,
-        actualProfit: actualProfit2025,
-        returnPercent: parseFloat(returnPercent2025.toFixed(2))
+        endValue,
+        capitalAdded,
+        actualProfit,
+        returnPercent: parseFloat(returnPercent.toFixed(2))
       });
-      continue;
     }
-    
-    // For future years (2026+)
-    const capitalAdded = getCapitalAddedInYear(year, false);
-    
-    // Calculate actual profit (excluding capital additions)
-    const actualProfit = endValue - startValue - capitalAdded;
-    
-    // Calculate return % based on average capital deployed
-    // Average capital = start + (capital added / 2) - approximates time-weighted return
-    const avgCapital = startValue + (capitalAdded / 2);
-    const returnPercent = avgCapital > 0 ? (actualProfit / avgCapital) * 100 : 0;
-    
-    result.push({
-      year,
-      startValue,
-      endValue,
-      capitalAdded,
-      actualProfit,
-      returnPercent: parseFloat(returnPercent.toFixed(2))
-    });
   }
   
   return result;
