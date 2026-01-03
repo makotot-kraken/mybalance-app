@@ -14,7 +14,7 @@ import {
   getLastUpdateTime
 } from './data/assets';
 import { calculateAnnualProfits } from './utils/annualProfit';
-import { trades } from './data/trade-log';
+import { tradeHistory } from './data/trade-history';
 
 // Import portfolio history
 import portfolioHistory from './data/portfolio-history.json';
@@ -362,10 +362,6 @@ export default function App() {
                 </View>
               ))
             )}
-            <Text style={styles.chartNote}>
-              2025 (Start Year): Profit = End - Start{'\n'}
-              Future Years: Profit = End - Start - Capital Added
-            </Text>
           </View>
           
           {/* Portfolio Summary with Expandable Sections */}
@@ -490,81 +486,39 @@ export default function App() {
           <View style={styles.section}>
             <View style={styles.sectionHeaderRow}>
               <Text style={styles.sectionTitle}>Trade History</Text>
-              {trades.length > 0 && (
-                <Text style={styles.tradeCount}>{trades.length} trade{trades.length !== 1 ? 's' : ''}</Text>
+              {tradeHistory.length > 0 && (
+                <Text style={styles.tradeCount}>{tradeHistory.length} trade{tradeHistory.length !== 1 ? 's' : ''}</Text>
               )}
             </View>
-            {trades.length === 0 ? (
-              <Text style={styles.chartNote}>No trades logged yet. Use the "Log Trade" button to record your trades.</Text>
+            {tradeHistory.length === 0 ? (
+              <Text style={styles.chartNote}>No trades logged yet. Add trades manually to data/trade-history.js</Text>
             ) : (
               <View>
-                {trades.slice().reverse().map((trade, index) => {
-                  const actualIndex = trades.length - 1 - index; // Get the actual index in the original array
-                  return (
-                    <View key={index} style={styles.tradeCard}>
-                      <View style={styles.tradeHeader}>
-                        <View style={styles.tradeSymbolRow}>
-                          <Text style={styles.tradeSymbol}>{trade.symbol}</Text>
-                          <View style={[styles.tradeBadge, { backgroundColor: trade.type === 'buy' ? '#4CAF50' : '#F44336' }]}>
-                            <Text style={styles.tradeBadgeText}>{trade.type.toUpperCase()}</Text>
-                          </View>
-                        </View>
-                        <View style={styles.tradeHeaderRight}>
-                          <Text style={styles.tradeDate}>{trade.date}</Text>
-                          <TouchableOpacity 
-                            style={styles.deleteTradeButton}
-                            onPress={() => {
-                              Alert.alert(
-                                'Delete Trade?',
-                                `Remove ${trade.type} ${trade.shares} ${trade.symbol} @ $${trade.pricePerShare.toFixed(2)}?\n\n` +
-                                `To delete this trade:\n` +
-                                `1. Open: data/trade-log.js\n` +
-                                `2. Find and remove the trade at index ${actualIndex}\n` +
-                                `   (${trade.symbol} on ${trade.date})\n` +
-                                `3. Rebuild and deploy\n\n` +
-                                `Trade details logged to console.`,
-                                [
-                                  { text: 'Cancel', style: 'cancel' },
-                                  { 
-                                    text: 'Show Details', 
-                                    onPress: () => {
-                                      console.log('\n=== DELETE THIS TRADE ===');
-                                      console.log('Index in array:', actualIndex);
-                                      console.log('Trade:', JSON.stringify(trade, null, 2));
-                                      console.log('\nFile: data/trade-log.js');
-                                      console.log(`Look for: ${trade.symbol} on ${trade.date}\n`);
-                                    }
-                                  }
-                                ]
-                              );
-                            }}
-                          >
-                            <Text style={styles.deleteTradeButtonText}>🗑️</Text>
-                          </TouchableOpacity>
+                {tradeHistory.slice().reverse().map((trade, index) => (
+                  <View key={index} style={styles.tradeCard}>
+                    <View style={styles.tradeHeader}>
+                      <View style={styles.tradeSymbolRow}>
+                        <Text style={styles.tradeSymbol}>{trade.symbol}</Text>
+                        <View style={[styles.tradeBadge, { backgroundColor: trade.type === 'buy' ? '#4CAF50' : '#F44336' }]}>
+                          <Text style={styles.tradeBadgeText}>{trade.type.toUpperCase()}</Text>
                         </View>
                       </View>
+                      <Text style={styles.tradeDate}>{trade.date}</Text>
+                    </View>
                     <View style={styles.tradeDetails}>
                       <View style={styles.tradeRow}>
                         <Text style={styles.tradeLabel}>Shares:</Text>
                         <Text style={styles.tradeValue}>{trade.shares}</Text>
                       </View>
                       <View style={styles.tradeRow}>
-                        <Text style={styles.tradeLabel}>Price/Share:</Text>
-                        <Text style={styles.tradeValue}>${trade.pricePerShare.toFixed(2)}</Text>
+                        <Text style={styles.tradeLabel}>Price:</Text>
+                        <Text style={styles.tradeValue}>${trade.price.toFixed(2)}</Text>
                       </View>
                       <View style={styles.tradeRow}>
-                        <Text style={styles.tradeLabel}>Total (USD):</Text>
-                        <Text style={styles.tradeValue}>${trade.totalCost.toFixed(2)}</Text>
-                      </View>
-                      <View style={styles.tradeRow}>
-                        <Text style={styles.tradeLabel}>Total (JPY):</Text>
+                        <Text style={styles.tradeLabel}>Total:</Text>
                         <Text style={[styles.tradeValue, { fontWeight: 'bold' }]}>
-                          ¥{trade.totalCostJPY.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                          ${trade.total.toFixed(2)}
                         </Text>
-                      </View>
-                      <View style={styles.tradeRow}>
-                        <Text style={styles.tradeLabel}>Exchange Rate:</Text>
-                        <Text style={styles.tradeValue}>¥{trade.exchangeRate.toFixed(2)}</Text>
                       </View>
                       {trade.note && (
                         <View style={styles.tradeNoteRow}>
@@ -573,8 +527,7 @@ export default function App() {
                       )}
                     </View>
                   </View>
-                  );
-                })}
+                ))}
               </View>
             )}
           </View>
