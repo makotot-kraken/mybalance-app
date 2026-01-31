@@ -9,8 +9,8 @@ export const annualPerformanceData = {
     endDate: "2025-12-31",     // Last day of year
     
     // Portfolio values (JPY)
-    startValue: 9143568,       // Nov 12, 2025 - Initial portfolio value
-    endValue: 9057170,         // Dec 31, 2025 - Calculated from actual market prices
+    startValue: 9143568,       // Nov 12, 2025 - Initial portfolio value  
+    endValue: null,            // Uses currentBalance (live value)
     currentBalance: null,      // Live value - updated real-time in app
     
     // Performance metrics

@@ -17,6 +17,7 @@ export function calculateAnnualProfits(history, currentHoldingsGain = null, curr
   // Calculate profit for each year
   const result = [];
   const sortedYears = Object.keys(years).sort();
+  let previous2025EndValue = null; // Track 2025's end value for 2026
   
   for (let i = 0; i < sortedYears.length; i++) {
     const year = sortedYears[i];
@@ -39,6 +40,16 @@ export function calculateAnnualProfits(history, currentHoldingsGain = null, curr
         ? currentHoldingsGain 
         : dbData.actualProfit;
       
+      // Store 2025's end value for 2026 to use
+      if (year === '2025') {
+        previous2025EndValue = endValue;
+      }
+      
+      // For 2026, use 2025's end value as start value
+      const startValue = year === '2026' && previous2025EndValue 
+        ? previous2025EndValue 
+        : dbData.startValue;
+      
       let returnPercent = 0;
       if (dbData.calculationMethod === 'hardcoded' && year === '2025') {
         // For 2025: return = profit / end value
@@ -48,14 +59,14 @@ export function calculateAnnualProfits(history, currentHoldingsGain = null, curr
         if (dbData.returnPercent !== null) {
           returnPercent = dbData.returnPercent;
         } else {
-          const avgCapital = dbData.startValue + (dbData.netCapitalChange / 2);
+          const avgCapital = startValue + (dbData.netCapitalChange / 2);
           returnPercent = avgCapital > 0 ? (actualProfit / avgCapital) * 100 : 0;
         }
       }
       
       result.push({
         year,
-        startValue: dbData.startValue,
+        startValue: startValue,
         endValue: endValue,
         capitalAdded: dbData.capitalAdded,
         actualProfit: actualProfit,
