@@ -10,12 +10,12 @@ export const annualPerformanceData = {
     
     // Portfolio values (JPY)
     startValue: 9143568,       // Nov 12, 2025 - Initial portfolio value  
-    endValue: null,            // Uses currentBalance (live value)
+    endValue: null,            // Left empty - not needed for 2025
     currentBalance: null,      // Live value - updated real-time in app
     
     // Performance metrics
-    actualProfit: null,        // Total gain/loss from all holdings
-    returnPercent: null,       // (actualProfit / endValue) * 100
+    actualProfit: -86398,      // HARDCODED: Total loss from Nov 12 to Dec 31, 2025
+    returnPercent: null,       // (actualProfit / currentBalance) * 100
     
     // Capital tracking
     capitalAdded: 0,           // No additional capital in 2025 (starting year)
