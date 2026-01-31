@@ -33,6 +33,37 @@ export const annualPerformanceData = {
     calculationMethod: "hardcoded", // "hardcoded" or "automatic"
     formula: "returnPercent = (actualProfit / endValue) * 100"
   },
+
+  // Year 2026
+  "2026": {
+    startDate: "2026-01-01",
+    endDate: "2026-12-31",
+    
+    // Portfolio values (JPY)
+    startValue: 9064958,       // Jan 1, 2026 - First snapshot value
+    endValue: null,            // Will be set to Dec 31 snapshot value
+    currentBalance: null,      // Live value - updated real-time in app
+    
+    // Performance metrics
+    actualProfit: null,        // endValue - startValue - capitalAdded
+    returnPercent: null,       // (actualProfit / avgCapital) * 100
+    
+    // Capital tracking
+    capitalAdded: 0,           // Total capital added in 2026
+    capitalWithdrawn: 0,       // Total withdrawals in 2026
+    netCapitalChange: 0,       // capitalAdded - capitalWithdrawn
+    
+    // Holdings breakdown
+    stocksProfit: null,        // Total profit from stock holdings
+    cryptoProfit: null,        // Total profit from crypto holdings
+    
+    // Notes
+    notes: "Full year tracking - Jan 1 to Dec 31, 2026",
+    
+    // Calculation method
+    calculationMethod: "automatic",
+    formula: "returnPercent = (actualProfit / avgCapital) * 100, where avgCapital = startValue + (capitalAdded / 2)"
+  },
   
   // Template for future years
   // "2026": {

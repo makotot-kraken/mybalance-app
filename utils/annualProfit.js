@@ -29,8 +29,15 @@ export function calculateAnnualProfits(history, currentHoldingsGain = null, curr
     
     if (dbData) {
       // Use database values for this year
-      const endValue = year === '2025' && currentBalance ? currentBalance : (dbData.endValue || entries.filter(e => e.totalValue !== null).slice(-1)[0]?.totalValue);
-      const actualProfit = year === '2025' && currentHoldingsGain !== null ? currentHoldingsGain : dbData.actualProfit;
+      // For current year (2025 or 2026), use live currentBalance if available
+      const isCurrentYear = year === new Date().getFullYear().toString();
+      const endValue = isCurrentYear && currentBalance 
+        ? currentBalance 
+        : (dbData.endValue || entries.filter(e => e.totalValue !== null).slice(-1)[0]?.totalValue);
+      
+      const actualProfit = isCurrentYear && currentHoldingsGain !== null 
+        ? currentHoldingsGain 
+        : dbData.actualProfit;
       
       let returnPercent = 0;
       if (dbData.calculationMethod === 'hardcoded' && year === '2025') {
