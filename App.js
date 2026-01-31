@@ -13,7 +13,6 @@ import {
   stopKeepAlive,
   getLastUpdateTime
 } from './data/assets';
-import { calculateAnnualProfits } from './utils/annualProfit';
 import { tradeHistory } from './data/trade-history';
 
 // Import portfolio history
@@ -206,10 +205,6 @@ export default function App() {
     }
   }, [prices]);
 
-  // Calculate annual profits - for 2025, use current holdings gains
-  const totalHoldingsGain = (stockTotalGainLoss || 0) + (cryptoTotalGainLoss || 0);
-  const annualProfits = calculateAnnualProfits(portfolioHistory, totalHoldingsGain, totalValue);
-
   return (
     <>
       <StatusBar style="light" backgroundColor="#0E1111" />
@@ -324,66 +319,6 @@ export default function App() {
               </View>
             </View>
           )}
-          
-          {/* Annual Profit Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Annual Performance</Text>
-            {annualProfits.length === 0 ? (
-              <Text style={styles.cardValue}>No annual data yet</Text>
-            ) : (
-              annualProfits.map((item) => (
-                <View key={item.year} style={styles.annualProfitCard}>
-                  <Text style={styles.annualYear}>{item.year}</Text>
-                  <View style={styles.annualGrid}>
-                    {item.year !== '2025' && (
-                      <View style={styles.annualRow}>
-                        <Text style={styles.annualLabel}>Start Value:</Text>
-                        <Text style={styles.annualValue}>
-                          {privacyMode ? '¥ •••••••' : `¥${item.startValue.toLocaleString('en-US', { maximumFractionDigits: 0 })}`}
-                        </Text>
-                      </View>
-                    )}
-                    <View style={styles.annualRow}>
-                      <Text style={styles.annualLabel}>End Value:</Text>
-                      <Text style={styles.annualValue}>
-                        {privacyMode ? '¥ •••••••' : `¥${item.endValue.toLocaleString('en-US', { maximumFractionDigits: 0 })}`}
-                      </Text>
-                    </View>
-                    {item.capitalAdded !== 0 && (
-                      <View style={styles.annualRow}>
-                        <Text style={styles.annualLabel}>Capital Added:</Text>
-                        <Text style={[styles.annualValue, { color: item.capitalAdded > 0 ? '#2196F3' : '#FF9800' }]}>
-                          {privacyMode 
-                            ? '¥ •••••••' 
-                            : `${item.capitalAdded > 0 ? '+' : ''}¥${item.capitalAdded.toLocaleString('en-US', { maximumFractionDigits: 0 })}`
-                          }
-                        </Text>
-                      </View>
-                    )}
-                    <View style={styles.annualRow}>
-                      <Text style={styles.annualLabel}>Actual Profit:</Text>
-                      <Text style={[styles.annualValue, { color: item.actualProfit >= 0 ? '#4CAF50' : '#F44336', fontWeight: 'bold' }]}>
-                        {privacyMode
-                          ? '¥ •••••••'
-                          : `${item.actualProfit >= 0 ? '+' : ''}¥${item.actualProfit.toLocaleString('en-US', { maximumFractionDigits: 0 })}`
-                        }
-                      </Text>
-                    </View>
-                    <View style={styles.annualRow}>
-                      <Text style={[styles.annualLabel, { fontWeight: 'bold' }]}>Return:</Text>
-                      <Text style={[styles.annualValue, { 
-                        color: item.returnPercent >= 0 ? '#4CAF50' : '#F44336', 
-                        fontWeight: 'bold',
-                        fontSize: 18
-                      }]}>
-                        {item.returnPercent >= 0 ? '+' : ''}{item.returnPercent}%
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              ))
-            )}
-          </View>
           
           {/* Portfolio Summary with Expandable Sections */}
           <View style={styles.section}>
