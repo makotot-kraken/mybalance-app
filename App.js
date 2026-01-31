@@ -248,9 +248,9 @@ export default function App() {
               <View style={styles.chartContainer}>
                 <LineChart
                   data={{
-                    labels: portfolioHistory.slice(-30).map((item, index) => {
-                      // Show every 5th date to avoid crowding
-                      if (index % 5 === 0) {
+                    labels: portfolioHistory.map((item, index) => {
+                      // Show every 10th date to avoid crowding on full history
+                      if (index % 10 === 0) {
                         const date = new Date(item.date);
                         return `${date.getMonth() + 1}/${date.getDate()}`;
                       }
@@ -258,17 +258,17 @@ export default function App() {
                     }),
                     datasets: [
                       {
-                        data: portfolioHistory.slice(-30).map(item => item.stockValue / 1000000), // Show in millions
+                        data: portfolioHistory.map(item => item.stockValue / 1000000), // Show in millions
                         color: (opacity = 1) => `rgba(76, 175, 80, ${opacity})`, // Green for stocks
                         strokeWidth: 2,
                       },
                       {
-                        data: portfolioHistory.slice(-30).map(item => item.cryptoValue / 1000000), // Show in millions
+                        data: portfolioHistory.map(item => item.cryptoValue / 1000000), // Show in millions
                         color: (opacity = 1) => `rgba(33, 150, 243, ${opacity})`, // Blue for crypto
                         strokeWidth: 2,
                       },
                       {
-                        data: portfolioHistory.slice(-30).map(item => item.totalValue / 1000000), // Show in millions
+                        data: portfolioHistory.map(item => item.totalValue / 1000000), // Show in millions
                         color: (opacity = 1) => `rgba(255, 193, 7, ${opacity})`, // Yellow for total
                         strokeWidth: 3,
                       },
@@ -314,7 +314,7 @@ export default function App() {
                   </View>
                 </View>
                 <Text style={styles.chartNote}>
-                  Last 30 days • Values in millions (M) • Updated daily at 6am JST
+                  Since Nov 12, 2025 • Values in millions (M) • Updated daily at 6am JST
                 </Text>
               </View>
             </View>
