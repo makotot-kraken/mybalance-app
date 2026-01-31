@@ -10,7 +10,7 @@ export const annualPerformanceData = {
     
     // Portfolio values (JPY)
     startValue: 9143568,       // Nov 12, 2025 - Initial portfolio value
-    endValue: null,            // Will be set to Dec 31 snapshot value
+    endValue: 9057170,         // Dec 31, 2025 snapshot value
     currentBalance: null,      // Live value - updated real-time in app
     
     // Performance metrics
@@ -40,7 +40,7 @@ export const annualPerformanceData = {
     endDate: "2026-12-31",
     
     // Portfolio values (JPY)
-    startValue: 9064958,       // Jan 1, 2026 - First snapshot value
+    startValue: 9057170,       // 2025 end value (Dec 31, 2025)
     endValue: null,            // Will be set to Dec 31 snapshot value
     currentBalance: null,      // Live value - updated real-time in app
     
