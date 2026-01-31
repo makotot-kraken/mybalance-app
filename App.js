@@ -20,7 +20,7 @@ import { tradeHistory } from './data/trade-history';
 import portfolioHistory from './data/portfolio-history.json';
 
 // Holding Card Component with gain/loss and percentage indicator
-function HoldingCard({ holding, price, displayPrice, currency, value, type, totalCategoryValue }) {
+function HoldingCard({ holding, price, displayPrice, currency, value, type, totalCategoryValue, privacyMode }) {
   const [gainLoss, setGainLoss] = useState(null);
   const [gainLossPercent, setGainLossPercent] = useState(null);
 
@@ -61,16 +61,16 @@ function HoldingCard({ holding, price, displayPrice, currency, value, type, tota
         </View>
         <Text style={styles.cardSubtitle}>{displayName}</Text>
         <Text style={styles.cardShares}>
-          {displayAmount} @ {displayPrice > 0 ? `${currency}${displayPrice.toLocaleString('en-US', { maximumFractionDigits: 2 })}` : 'Loading...'}
+          {privacyMode ? `${percentageOfCategory.toFixed(1)}% of portfolio` : `${displayAmount} @ ${displayPrice > 0 ? `${currency}${displayPrice.toLocaleString('en-US', { maximumFractionDigits: 2 })}` : 'Loading...'}`}
         </Text>
       </View>
       <View style={styles.cardRight}>
         <Text style={styles.cardValue}>
-          {value > 0 ? `¥${value.toLocaleString('en-US', { maximumFractionDigits: 0 })}` : 'N/A'}
+          {privacyMode ? '•••••' : (value > 0 ? `¥${value.toLocaleString('en-US', { maximumFractionDigits: 0 })}` : 'N/A')}
         </Text>
         <Text style={[styles.cardChange, { color: changeColor }]}>
           {gainLoss !== null ? (
-            `${isPositive ? '+' : ''}¥${gainLoss.toLocaleString('en-US', { maximumFractionDigits: 0 })} (${isPositive ? '+' : ''}${gainLossPercent.toFixed(2)}%)`
+            privacyMode ? `${isPositive ? '+' : ''}${gainLossPercent.toFixed(2)}%` : `${isPositive ? '+' : ''}¥${gainLoss.toLocaleString('en-US', { maximumFractionDigits: 0 })} (${isPositive ? '+' : ''}${gainLossPercent.toFixed(2)}%)`
           ) : 'Calculating...'}
         </Text>
       </View>
@@ -90,6 +90,7 @@ export default function App() {
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const [stocksExpanded, setStocksExpanded] = useState(false);
   const [cryptoExpanded, setCryptoExpanded] = useState(false);
+  const [privacyMode, setPrivacyMode] = useState(false);
   
   const loadPrices = async () => {
     try {
@@ -219,11 +220,21 @@ export default function App() {
         }
       >
         <View style={styles.content}>
-          <Text style={styles.greeting}>Welcome to MyBalance</Text>
-          <Text style={styles.subtitle}>Total Portfolio Value</Text>
-          <Text style={styles.totalValue}>
-            ¥{totalValue > 0 ? totalValue.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '0'}
-          </Text>
+          <View style={styles.headerRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.greeting}>Welcome to MyBalance</Text>
+              <Text style={styles.subtitle}>Total Portfolio Value</Text>
+              <Text style={styles.totalValue}>
+                {privacyMode ? '¥ •••••••' : `¥${totalValue > 0 ? totalValue.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '0'}`}
+              </Text>
+            </View>
+            <TouchableOpacity 
+              style={styles.privacyButton}
+              onPress={() => setPrivacyMode(!privacyMode)}
+            >
+              <Text style={styles.privacyButtonText}>{privacyMode ? '👁️' : '🔒'}</Text>
+            </TouchableOpacity>
+          </View>
           <Text style={styles.lastUpdate}>
             Last updated: {lastUpdate.toLocaleDateString()} {lastUpdate.toLocaleTimeString()}
           </Text>
@@ -378,13 +389,16 @@ export default function App() {
                 <View style={styles.cardHeaderLeft}>
                   <Text style={styles.cardTitle}>Stocks ({portfolio.stocks.length} holdings)</Text>
                   <Text style={styles.cardValue}>
-                    ¥{stockValue > 0 ? stockValue.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '0'}
+                    {privacyMode ? '¥ •••••••' : `¥${stockValue > 0 ? stockValue.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '0'}`}
                   </Text>
                   {stockTotalGainLoss !== null && (
                     <Text style={[styles.cardChange, { 
                       color: stockTotalGainLoss >= 0 ? '#4CAF50' : '#F44336' 
                     }]}>
-                      {stockTotalGainLoss >= 0 ? '+' : ''}¥{stockTotalGainLoss.toLocaleString('en-US', { maximumFractionDigits: 0 })} ({stockTotalGainLoss >= 0 ? '+' : ''}{stockTotalGainLossPercent.toFixed(2)}%)
+                      {privacyMode 
+                        ? `${stockTotalGainLoss >= 0 ? '+' : ''}${stockTotalGainLossPercent.toFixed(2)}%`
+                        : `${stockTotalGainLoss >= 0 ? '+' : ''}¥${stockTotalGainLoss.toLocaleString('en-US', { maximumFractionDigits: 0 })} (${stockTotalGainLoss >= 0 ? '+' : ''}${stockTotalGainLossPercent.toFixed(2)}%)`
+                      }
                     </Text>
                   )}
                   <Text style={styles.cardPercentage}>
@@ -422,6 +436,7 @@ export default function App() {
                         value={value}
                         type="stock"
                         totalCategoryValue={stockValue}
+                        privacyMode={privacyMode}
                       />
                     );
                   })}
@@ -438,13 +453,16 @@ export default function App() {
                 <View style={styles.cardHeaderLeft}>
                   <Text style={styles.cardTitle}>Crypto ({portfolio.crypto.length} holding)</Text>
                   <Text style={styles.cardValue}>
-                    ¥{cryptoValue > 0 ? cryptoValue.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '0'}
+                    {privacyMode ? '¥ •••••••' : `¥${cryptoValue > 0 ? cryptoValue.toLocaleString('en-US', { maximumFractionDigits: 0 }) : '0'}`}
                   </Text>
                   {cryptoTotalGainLoss !== null && (
                     <Text style={[styles.cardChange, { 
                       color: cryptoTotalGainLoss >= 0 ? '#4CAF50' : '#F44336' 
                     }]}>
-                      {cryptoTotalGainLoss >= 0 ? '+' : ''}¥{cryptoTotalGainLoss.toLocaleString('en-US', { maximumFractionDigits: 0 })} ({cryptoTotalGainLoss >= 0 ? '+' : ''}{cryptoTotalGainLossPercent.toFixed(2)}%)
+                      {privacyMode
+                        ? `${cryptoTotalGainLoss >= 0 ? '+' : ''}${cryptoTotalGainLossPercent.toFixed(2)}%`
+                        : `${cryptoTotalGainLoss >= 0 ? '+' : ''}¥${cryptoTotalGainLoss.toLocaleString('en-US', { maximumFractionDigits: 0 })} (${cryptoTotalGainLoss >= 0 ? '+' : ''}${cryptoTotalGainLossPercent.toFixed(2)}%)`
+                      }
                     </Text>
                   )}
                   <Text style={styles.cardPercentage}>
@@ -475,6 +493,7 @@ export default function App() {
                       value={value}
                       type="crypto"
                       totalCategoryValue={cryptoValue}
+                      privacyMode={privacyMode}
                     />
                   );
                 })}
@@ -766,6 +785,20 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: 8,
+  },
+  privacyButton: {
+    backgroundColor: '#2A2A2A',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 8,
+    borderWidth: 2,
+    borderColor: '#FFC107',
+  },
+  privacyButtonText: {
+    fontSize: 24,
   },
   logTradeButton: {
     backgroundColor: '#4CAF50',
