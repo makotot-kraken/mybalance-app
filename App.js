@@ -338,25 +338,35 @@ export default function App() {
                     {item.year !== '2025' && (
                       <View style={styles.annualRow}>
                         <Text style={styles.annualLabel}>Start Value:</Text>
-                        <Text style={styles.annualValue}>¥{item.startValue.toLocaleString('en-US', { maximumFractionDigits: 0 })}</Text>
+                        <Text style={styles.annualValue}>
+                          {privacyMode ? '¥ •••••••' : `¥${item.startValue.toLocaleString('en-US', { maximumFractionDigits: 0 })}`}
+                        </Text>
                       </View>
                     )}
                     <View style={styles.annualRow}>
                       <Text style={styles.annualLabel}>End Value:</Text>
-                      <Text style={styles.annualValue}>¥{item.endValue.toLocaleString('en-US', { maximumFractionDigits: 0 })}</Text>
+                      <Text style={styles.annualValue}>
+                        {privacyMode ? '¥ •••••••' : `¥${item.endValue.toLocaleString('en-US', { maximumFractionDigits: 0 })}`}
+                      </Text>
                     </View>
                     {item.capitalAdded !== 0 && (
                       <View style={styles.annualRow}>
                         <Text style={styles.annualLabel}>Capital Added:</Text>
                         <Text style={[styles.annualValue, { color: item.capitalAdded > 0 ? '#2196F3' : '#FF9800' }]}>
-                          {item.capitalAdded > 0 ? '+' : ''}¥{item.capitalAdded.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                          {privacyMode 
+                            ? '¥ •••••••' 
+                            : `${item.capitalAdded > 0 ? '+' : ''}¥${item.capitalAdded.toLocaleString('en-US', { maximumFractionDigits: 0 })}`
+                          }
                         </Text>
                       </View>
                     )}
                     <View style={styles.annualRow}>
                       <Text style={styles.annualLabel}>Actual Profit:</Text>
                       <Text style={[styles.annualValue, { color: item.actualProfit >= 0 ? '#4CAF50' : '#F44336', fontWeight: 'bold' }]}>
-                        {item.actualProfit >= 0 ? '+' : ''}¥{item.actualProfit.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                        {privacyMode
+                          ? '¥ •••••••'
+                          : `${item.actualProfit >= 0 ? '+' : ''}¥${item.actualProfit.toLocaleString('en-US', { maximumFractionDigits: 0 })}`
+                        }
                       </Text>
                     </View>
                     <View style={styles.annualRow}>
